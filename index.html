@@ -7,1346 +7,2089 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CrackScreen">
-<title>CrackScreen – Broken Screen Prank</title>
+<meta name="description" content="The most realistic broken screen prank app of 2026">
+<link rel="manifest" href="#" id="manifest-link">
+<title>CrackScreen – Fake Broken Screen Prank</title>
+
 <style>
+  /* ============================================================
+     RESET & BASE
+  ============================================================ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --neon-blue: #00d4ff;
+    --neon-purple: #b300ff;
+    --neon-pink: #ff0080;
+    --neon-green: #00ff88;
+    --glass-bg: rgba(255,255,255,0.06);
+    --glass-border: rgba(255,255,255,0.12);
+    --dark-bg: #050508;
+    --card-bg: rgba(15,15,25,0.85);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255,255,255,0.55);
+  }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--dark-bg);
+    color: var(--text-primary);
+    font-family: 'SF Pro Display', -apple-system, 'Helvetica Neue', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: none;
+  }
 
-/* ── RESET ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  /* ============================================================
+     SCREENS LAYOUT
+  ============================================================ */
+  .screen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 0.5s ease;
+  }
+  .screen.hidden { opacity: 0; pointer-events: none; }
 
-html, body {
-  width: 100%; height: 100%;
-  overflow: hidden;
-  background: #000;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: none;
-}
+  /* ============================================================
+     SCREEN 1: LAUNCH / START PRANK
+  ============================================================ */
+  #screen-launch {
+    background: radial-gradient(ellipse at 30% 20%, rgba(0,212,255,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(179,0,255,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 50%, rgba(255,0,128,0.08) 0%, transparent 70%),
+                #050508;
+    overflow: hidden;
+  }
+  #screen-launch::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.015) 2px, rgba(0,212,255,0.015) 4px);
+    pointer-events: none;
+  }
 
-/* ── ALL SCREENS ── */
-.screen {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.hidden { display: none !important; }
+  /* Floating particles bg */
+  .particle-field {
+    position: absolute; inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: float-particle linear infinite;
+    opacity: 0;
+  }
 
-/* ════════════════════════════════
-   LAUNCH SCREEN
-════════════════════════════════ */
-#s-launch {
-  background: radial-gradient(ellipse at 50% 0%, #1a0a2e 0%, #000 70%);
-  gap: 0;
-  z-index: 10;
-}
-.launch-glow {
-  width: 180px; height: 180px;
-  background: radial-gradient(circle, rgba(255,59,48,0.25) 0%, transparent 70%);
-  position: absolute;
-  top: 15%;
-  border-radius: 50%;
-  animation: glow-pulse 2.5s ease-in-out infinite;
-}
-@keyframes glow-pulse {
-  0%,100% { transform: scale(1); opacity: 0.6; }
-  50%      { transform: scale(1.3); opacity: 1; }
-}
-.launch-emoji {
-  font-size: 72px;
-  margin-bottom: 20px;
-  animation: float 3s ease-in-out infinite;
-  position: relative;
-  z-index: 1;
-}
-@keyframes float {
-  0%,100% { transform: translateY(0); }
-  50%      { transform: translateY(-8px); }
-}
-.launch-title {
-  color: #fff;
-  font-size: clamp(28px, 8vw, 36px);
-  font-weight: 800;
-  letter-spacing: -1px;
-  position: relative; z-index: 1;
-}
-.launch-sub {
-  color: rgba(255,255,255,0.45);
-  font-size: 14px;
-  text-align: center;
-  max-width: 240px;
-  line-height: 1.5;
-  margin: 10px 0 36px;
-  position: relative; z-index: 1;
-}
-.btn-main {
-  background: linear-gradient(135deg, #ff3b30, #ff6b35);
-  color: #fff;
-  border: none;
-  border-radius: 60px;
-  padding: 17px 56px;
-  font-size: 18px;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 8px 30px rgba(255,59,48,0.5);
-  position: relative; z-index: 1;
-  letter-spacing: 0.3px;
-  transition: transform 0.1s;
-}
-.btn-main:active { transform: scale(0.96); }
-.btn-settings {
-  margin-top: 14px;
-  background: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.6);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 60px;
-  padding: 12px 32px;
-  font-size: 14px;
-  cursor: pointer;
-  position: relative; z-index: 1;
-}
-.launch-footer {
-  color: rgba(255,255,255,0.15);
-  font-size: 11px;
-  margin-top: 28px;
-  position: relative; z-index: 1;
-}
+  @keyframes float-particle {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-20px) rotate(720deg); opacity: 0; }
+  }
 
-/* ════════════════════════════════
-   COUNTDOWN SCREEN
-════════════════════════════════ */
-#s-countdown {
-  background: #000;
-  gap: 12px;
-  z-index: 20;
-}
-.cd-label {
-  color: rgba(255,255,255,0.5);
-  font-size: 13px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-#cd-num {
-  color: #fff;
-  font-size: clamp(120px, 40vw, 200px);
-  font-weight: 900;
-  line-height: 1;
-}
-#cd-num.pop {
-  animation: pop 0.35s cubic-bezier(0.34,1.56,0.64,1);
-}
-@keyframes pop {
-  0%   { transform: scale(1.5); opacity: 0; }
-  100% { transform: scale(1);   opacity: 1; }
-}
-.cd-hint {
-  color: rgba(255,255,255,0.3);
-  font-size: 13px;
-  text-align: center;
-  max-width: 220px;
-  line-height: 1.5;
-}
+  .launch-content {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 0;
+    padding: 20px;
+    width: 100%; max-width: 420px;
+  }
 
-/* ════════════════════════════════
-   FAKE HOME SCREEN
-════════════════════════════════ */
-#s-home {
-  background: linear-gradient(170deg, #1b2a4a 0%, #0f1e35 50%, #060d1a 100%);
-  justify-content: flex-start;
-  z-index: 15;
-  padding-top: 60px;
-}
-.home-status {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 24px;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 20px;
-}
-.home-time {
-  color: #fff;
-  font-size: clamp(60px, 18vw, 80px);
-  font-weight: 200;
-  text-align: center;
-  letter-spacing: -2px;
-}
-.home-date {
-  color: rgba(255,255,255,0.65);
-  font-size: 15px;
-  text-align: center;
-  margin-top: 6px;
-}
-.home-icons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
-  margin: 44px auto 0;
-  padding: 0 20px;
-  width: 100%;
-  max-width: 340px;
-}
-.icon-wrap {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-}
-.icon-box {
-  width: 58px; height: 58px;
-  border-radius: 13px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 28px;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.4);
-}
-.icon-name { color: rgba(255,255,255,0.8); font-size: 10px; }
-.home-dock {
-  position: absolute;
-  bottom: 28px;
-  display: flex;
-  gap: 20px;
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 22px;
-  padding: 14px 28px;
-}
+  /* Cracked phone icon */
+  .phone-icon-wrap {
+    position: relative;
+    width: 140px; height: 180px;
+    margin-bottom: 32px;
+    animation: phone-float 3s ease-in-out infinite;
+  }
+  @keyframes phone-float {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-12px) rotate(2deg); }
+  }
+  .phone-icon-svg {
+    width: 100%; height: 100%;
+    filter: drop-shadow(0 0 30px rgba(0,212,255,0.4)) drop-shadow(0 0 60px rgba(179,0,255,0.2));
+  }
 
-/* ════════════════════════════════
-   CRACK SCREEN
-════════════════════════════════ */
-#s-crack {
-  background: #000;
-  z-index: 5;
-}
-#c-crack, #c-particles {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-#c-crack     { z-index: 6; }
-#c-particles { z-index: 7; }
+  /* Glow ring */
+  .glow-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,212,255,0.3);
+    animation: ring-pulse 2s ease-in-out infinite;
+  }
+  .glow-ring:nth-child(2) {
+    width: 250px; height: 250px;
+    animation-delay: 0.5s;
+    border-color: rgba(179,0,255,0.2);
+  }
+  @keyframes ring-pulse {
+    0%, 100% { opacity: 0.5; transform: translate(-50%,-50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%,-50%) scale(1.05); }
+  }
 
-.glass-sheen {
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg,
-    rgba(255,255,255,0.04) 0%,
-    transparent 50%,
-    rgba(255,255,255,0.03) 100%);
-  pointer-events: none;
-  z-index: 8;
-}
-.vignette {
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.65) 100%);
-  pointer-events: none;
-  z-index: 9;
-}
-#tap-hint {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  color: rgba(255,255,255,0.4);
-  font-size: 15px;
-  pointer-events: none;
-  z-index: 10;
-  transition: opacity 0.6s;
-  line-height: 1.7;
-}
-#tap-hint .big { font-size: 36px; display: block; margin-bottom: 4px; }
-#press-harder {
-  position: absolute;
-  top: 38%; left: 50%;
-  transform: translate(-50%, -50%);
-  color: #fff;
-  font-size: 24px;
-  font-weight: 900;
-  text-shadow: 0 0 30px rgba(255,59,48,0.9);
-  pointer-events: none;
-  z-index: 11;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-#press-harder.show { opacity: 1; }
+  .app-title {
+    font-size: clamp(32px, 8vw, 48px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    text-align: center;
+    background: linear-gradient(135deg, #fff 0%, var(--neon-blue) 50%, var(--neon-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .app-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 40px;
+  }
 
-/* Error toasts */
-#error-zone {
-  position: absolute;
-  bottom: 110px; left: 0; right: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  pointer-events: none;
-  z-index: 12;
-}
-.err-toast {
-  background: rgba(18,18,18,0.93);
-  border: 1px solid rgba(255,59,48,0.35);
-  border-radius: 13px;
-  padding: 11px 18px;
-  text-align: center;
-  max-width: 280px;
-  animation: slide-up 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
-}
-@keyframes slide-up {
-  from { transform: translateY(30px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-.err-title { color: #ff3b30; font-size: 12px; font-weight: 700; letter-spacing: 0.4px; }
-.err-body  { color: rgba(255,255,255,0.8); font-size: 13px; margin-top: 3px; }
+  /* Stats row */
+  .stats-row {
+    display: flex; gap: 16px;
+    margin-bottom: 40px;
+    width: 100%;
+  }
+  .stat-card {
+    flex: 1;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 14px 10px;
+    text-align: center;
+    backdrop-filter: blur(20px);
+  }
+  .stat-num {
+    font-size: 22px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-label {
+    font-size: 10px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
 
-/* Bottom bar */
-#bottom-bar {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  z-index: 20;
-}
-#ad-banner {
-  background: rgba(20,20,20,0.96);
-  border-top: 1px solid rgba(255,255,255,0.06);
-  text-align: center;
-  color: rgba(255,255,255,0.25);
-  font-size: 11px;
-  padding: 6px;
-  letter-spacing: 0.4px;
-}
-#action-bar {
-  display: flex;
-  justify-content: space-around;
-  padding: 10px 0;
-  background: rgba(8,8,8,0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(255,255,255,0.07);
-}
-.act-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  background: none; border: none;
-  color: rgba(255,255,255,0.65);
-  font-size: 10px;
-  cursor: pointer;
-  padding: 4px 10px;
-  border-radius: 8px;
-  touch-action: manipulation;
-}
-.act-btn .icon { font-size: 21px; }
-.act-btn:active { background: rgba(255,255,255,0.08); color: #fff; }
+  /* Start button */
+  .btn-start {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 0 40px rgba(0,212,255,0.4), 0 0 80px rgba(179,0,255,0.2);
+    margin-bottom: 16px;
+  }
+  .btn-start::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+  }
+  .btn-start::after {
+    content: '';
+    position: absolute; top: -50%; left: -60%;
+    width: 40%; height: 200%;
+    background: rgba(255,255,255,0.3);
+    transform: skewX(-20deg);
+    animation: btn-shine 3s ease-in-out infinite;
+  }
+  @keyframes btn-shine {
+    0% { left: -60%; }
+    30%, 100% { left: 150%; }
+  }
+  .btn-start:active { transform: scale(0.97); }
+  .btn-start span { position: relative; z-index: 1; }
 
-/* Shake animation */
-@keyframes shake {
-  0%,100%{ transform:translate(0,0); }
-  15%    { transform:translate(-9px,4px); }
-  30%    { transform:translate(9px,-3px); }
-  45%    { transform:translate(-7px,5px); }
-  60%    { transform:translate(7px,-4px); }
-  75%    { transform:translate(-4px,2px); }
-  90%    { transform:translate(4px,-2px); }
-}
-.do-shake { animation: shake 0.45s ease; }
+  /* Settings row */
+  .settings-row {
+    display: flex; gap: 12px; width: 100%;
+  }
+  .btn-setting {
+    flex: 1;
+    padding: 14px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    backdrop-filter: blur(20px);
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .btn-setting:active { background: rgba(255,255,255,0.1); color: #fff; }
+  .btn-setting .icon { font-size: 18px; display: block; margin-bottom: 4px; }
 
-/* ════════════════════════════════
-   BOOT SCREEN
-════════════════════════════════ */
-#s-boot {
-  background: #000;
-  z-index: 50;
-  gap: 20px;
-}
-.boot-logo {
-  width: 64px; height: 64px;
-  opacity: 0;
-  animation: fade-in 0.6s ease 0.3s forwards;
-}
-@keyframes fade-in { to { opacity: 1; } }
-.boot-brand {
-  color: rgba(255,255,255,0.75);
-  font-size: 13px;
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  opacity: 0;
-  animation: fade-in 0.6s ease 0.7s forwards;
-}
-.boot-bar-wrap {
-  width: 150px; height: 2px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 2px;
-  overflow: hidden;
-  opacity: 0;
-  animation: fade-in 0.4s ease 1s forwards;
-}
-#boot-bar {
-  height: 100%;
-  width: 0%;
-  background: rgba(255,255,255,0.75);
-  border-radius: 2px;
-  transition: width 2.2s linear;
-}
+  /* Premium badge */
+  .premium-badge {
+    margin-top: 20px;
+    padding: 8px 20px;
+    background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,140,0,0.1));
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 20px;
+    font-size: 12px;
+    color: #ffd700;
+    text-align: center;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .premium-badge:active { background: rgba(255,215,0,0.2); }
 
-/* ════════════════════════════════
-   SETTINGS DRAWER
-════════════════════════════════ */
-#s-settings {
-  background: rgba(0,0,0,0.75);
-  justify-content: flex-end;
-  z-index: 80;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-.drawer {
-  background: #1c1c1e;
-  border-radius: 22px 22px 0 0;
-  width: 100%;
-  max-height: 85vh;
-  overflow-y: auto;
-  padding-bottom: 40px;
-  -webkit-overflow-scrolling: touch;
-}
-.drawer-handle {
-  width: 38px; height: 4px;
-  background: rgba(255,255,255,0.18);
-  border-radius: 2px;
-  margin: 14px auto 18px;
-}
-.drawer h2 { color: #fff; font-size: 18px; font-weight: 700; padding: 0 20px 14px; border-bottom: 1px solid rgba(255,255,255,0.07); }
-.section-label { color: rgba(255,255,255,0.4); font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; padding: 14px 20px 6px; }
-.s-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 13px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.s-row-label { color: #fff; font-size: 15px; }
-.s-row-sub   { color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 2px; }
-.tog { position: relative; width: 50px; height: 30px; flex-shrink: 0; cursor: pointer; }
-.tog input { opacity: 0; width: 0; height: 0; position: absolute; }
-.tog-track {
-  position: absolute; inset: 0;
-  background: rgba(255,255,255,0.15);
-  border-radius: 30px;
-  transition: background 0.2s;
-}
-.tog-track::after {
-  content: '';
-  position: absolute;
-  left: 2px; top: 2px;
-  width: 26px; height: 26px;
-  background: #fff;
-  border-radius: 50%;
-  transition: transform 0.2s;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.3);
-}
-.tog input:checked ~ .tog-track { background: #34c759; }
-.tog input:checked ~ .tog-track::after { transform: translateX(20px); }
-.s-range {
-  -webkit-appearance: none;
-  width: 130px; height: 4px;
-  background: rgba(255,255,255,0.18);
-  border-radius: 2px;
-  outline: none;
-}
-.s-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 22px; height: 22px;
-  background: #fff;
-  border-radius: 50%;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.3);
-}
-.range-val { color: rgba(255,255,255,0.5); font-size: 13px; min-width: 20px; text-align: right; }
-.pack-scroll {
-  display: flex; gap: 12px;
-  padding: 10px 20px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.pack-scroll::-webkit-scrollbar { display: none; }
-.pack-card {
-  flex-shrink: 0;
-  width: 76px;
-  background: rgba(255,255,255,0.06);
-  border: 1.5px solid rgba(255,255,255,0.1);
-  border-radius: 14px;
-  padding: 10px 6px 8px;
-  text-align: center;
-  cursor: pointer;
-  position: relative;
-  transition: border-color 0.15s, background 0.15s;
-}
-.pack-card.sel { border-color: #0af; background: rgba(0,170,255,0.1); }
-.pack-em   { font-size: 26px; display: block; }
-.pack-nm   { color: rgba(255,255,255,0.75); font-size: 10px; margin-top: 4px; }
-.pack-pr   { color: #ffd60a; font-size: 9px; font-weight: 700; margin-top: 2px; }
-.pack-lock { position: absolute; top: 4px; right: 6px; font-size: 10px; }
-.btn-noad {
-  margin: 16px 20px 0;
-  width: calc(100% - 40px);
-  background: linear-gradient(135deg, #5e5ce6, #bf5af2);
-  border: none; border-radius: 14px;
-  padding: 15px;
-  color: #fff; font-size: 15px; font-weight: 700;
-  cursor: pointer;
-}
-.btn-close-drawer {
-  margin: 12px 20px 0;
-  width: calc(100% - 40px);
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 14px;
-  padding: 14px;
-  color: #fff; font-size: 15px;
-  cursor: pointer;
-}
+  /* ============================================================
+     SCREEN 2: COUNTDOWN
+  ============================================================ */
+  #screen-countdown {
+    background: #000;
+  }
+  .countdown-inner {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px;
+  }
+  .countdown-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+  .countdown-num {
+    font-size: clamp(120px, 35vw, 200px);
+    font-weight: 900;
+    line-height: 1;
+    background: linear-gradient(135deg, #fff 0%, var(--neon-blue) 60%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: cd-pulse 1s ease-in-out infinite;
+    filter: drop-shadow(0 0 40px rgba(0,212,255,0.8));
+  }
+  @keyframes cd-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  .countdown-hint {
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+    text-align: center;
+    padding: 0 30px;
+  }
 
-/* ════════════════════════════════
-   INTERSTITIAL
-════════════════════════════════ */
-#s-inter {
-  background: rgba(0,0,0,0.96);
-  z-index: 90;
-  gap: 16px;
-}
-#s-inter h2 { color: #fff; font-size: 20px; font-weight: 700; }
-#s-inter p  { color: rgba(255,255,255,0.45); font-size: 14px; text-align: center; max-width: 260px; }
-.ad-mock {
-  width: 300px; height: 220px;
-  background: rgba(255,255,255,0.04);
-  border: 1px dashed rgba(255,255,255,0.12);
-  border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  color: rgba(255,255,255,0.18);
-  font-size: 13px;
-}
-.btn-skip {
-  background: rgba(255,255,255,0.09);
-  border: 1px solid rgba(255,255,255,0.18);
-  border-radius: 50px;
-  padding: 12px 36px;
-  color: #fff; font-size: 14px;
-  cursor: pointer;
-}
+  /* ============================================================
+     SCREEN 3: HOME SCREEN (FAKE PHONE)
+  ============================================================ */
+  #screen-home {
+    background: #000;
+    overflow: hidden;
+    cursor: none;
+  }
 
-/* ════════════════════════════════
-   SHARE MODAL
-════════════════════════════════ */
-#s-share {
-  background: rgba(0,0,0,0.82);
-  z-index: 95;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-.share-box {
-  background: #1c1c1e;
-  border-radius: 22px;
-  padding: 22px;
-  width: min(310px, 90vw);
-  display: flex; flex-direction: column; align-items: center; gap: 14px;
-}
-.share-box h2 { color: #fff; font-size: 17px; font-weight: 700; }
-#share-preview {
-  width: 100%;
-  aspect-ratio: 9/16;
-  max-height: 260px;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: #000;
-}
-#share-preview canvas { width: 100%; height: 100%; display: block; }
-.share-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-.sbtn {
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 12px;
-  padding: 9px 16px;
-  color: #fff; font-size: 13px;
-  cursor: pointer;
-}
-.sbtn:active { background: rgba(255,255,255,0.15); }
-.btn-close-share {
-  background: none; border: none;
-  color: rgba(255,255,255,0.4);
-  font-size: 14px; cursor: pointer;
-}
+  /* Wallpaper */
+  .wallpaper {
+    position: absolute; inset: 0;
+    background: 
+      radial-gradient(ellipse at 20% 10%, rgba(100,180,255,0.5) 0%, transparent 40%),
+      radial-gradient(ellipse at 80% 90%, rgba(200,100,255,0.4) 0%, transparent 40%),
+      radial-gradient(ellipse at 50% 50%, rgba(255,100,150,0.2) 0%, transparent 60%),
+      linear-gradient(160deg, #0a0a2e 0%, #1a0a3e 30%, #0d1a4e 60%, #0a2030 100%);
+    z-index: 0;
+  }
+  /* Aurora effect */
+  .wallpaper::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: 
+      radial-gradient(ellipse at 30% 40%, rgba(0,200,255,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 60%, rgba(180,0,255,0.12) 0%, transparent 50%);
+    animation: aurora 8s ease-in-out infinite alternate;
+  }
+  @keyframes aurora {
+    0% { opacity: 0.5; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.1) rotate(3deg); }
+  }
 
-/* ════════════════════════════════
-   TOAST
-════════════════════════════════ */
-#toast {
-  position: fixed;
-  top: 56px; left: 50%;
-  transform: translateX(-50%);
-  background: rgba(25,25,25,0.95);
-  color: #fff;
-  padding: 11px 22px;
-  border-radius: 50px;
-  font-size: 14px; font-weight: 600;
-  white-space: nowrap;
-  z-index: 999;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
-  display: none;
-  pointer-events: none;
-}
+  /* Dynamic Island */
+  .dynamic-island {
+    position: absolute;
+    top: 14px; left: 50%;
+    transform: translateX(-50%);
+    width: 126px; height: 37px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
+  }
+  .dynamic-island.expand {
+    width: 240px; height: 50px;
+    border-radius: 26px;
+  }
+  .di-camera {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(100,100,100,0.8), #111);
+    box-shadow: inset 0 0 4px rgba(0,200,255,0.3);
+  }
+  .di-speaker {
+    width: 48px; height: 6px;
+    background: #1a1a1a;
+    border-radius: 3px;
+  }
 
+  /* Status bar */
+  .status-bar {
+    position: absolute;
+    top: 18px; left: 0; right: 0;
+    height: 44px;
+    display: flex; align-items: center;
+    padding: 0 24px;
+    z-index: 90;
+  }
+  .status-time {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: #fff;
+  }
+  .status-icons {
+    margin-left: auto;
+    display: flex; align-items: center;
+    gap: 6px;
+  }
+  .status-icon {
+    color: #fff;
+    font-size: 13px;
+  }
+  /* Battery */
+  .battery {
+    display: flex; align-items: center;
+    gap: 2px;
+  }
+  .battery-body {
+    width: 24px; height: 12px;
+    border: 1.5px solid rgba(255,255,255,0.8);
+    border-radius: 3px;
+    padding: 1.5px;
+    position: relative;
+  }
+  .battery-body::after {
+    content: '';
+    position: absolute; right: -5px; top: 50%;
+    transform: translateY(-50%);
+    width: 3px; height: 5px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 0 1px 1px 0;
+  }
+  .battery-fill {
+    height: 100%; width: 75%;
+    background: #5afc00;
+    border-radius: 1px;
+  }
+
+  /* Lock screen clock */
+  .lock-clock {
+    position: absolute;
+    top: 25%;
+    left: 0; right: 0;
+    display: flex; flex-direction: column;
+    align-items: center;
+    z-index: 10;
+  }
+  .lock-time {
+    font-size: clamp(64px, 18vw, 88px);
+    font-weight: 100;
+    letter-spacing: -4px;
+    line-height: 1;
+    color: rgba(255,255,255,0.95);
+    text-shadow: 0 0 40px rgba(255,255,255,0.3);
+  }
+  .lock-date {
+    font-size: 16px;
+    color: rgba(255,255,255,0.75);
+    font-weight: 400;
+    margin-top: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Weather widget */
+  .weather-widget {
+    position: absolute;
+    top: 52%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 16px 24px;
+    display: flex; align-items: center;
+    gap: 12px;
+    z-index: 10;
+    min-width: 200px;
+  }
+  .weather-icon { font-size: 36px; }
+  .weather-info {}
+  .weather-temp {
+    font-size: 28px;
+    font-weight: 300;
+    color: #fff;
+    line-height: 1;
+  }
+  .weather-cond {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 2px;
+  }
+
+  /* Notification */
+  .notif-stack {
+    position: absolute;
+    bottom: 160px;
+    left: 20px; right: 20px;
+    z-index: 10;
+    display: flex; flex-direction: column;
+    gap: 8px;
+  }
+  .notif-card {
+    background: rgba(30,30,40,0.75);
+    backdrop-filter: blur(40px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 12px 14px;
+    display: flex; align-items: center;
+    gap: 10px;
+    animation: notif-slide 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .notif-card:nth-child(2) { animation-delay: 0.1s; }
+  @keyframes notif-slide {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .notif-app-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .notif-content {}
+  .notif-app { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .notif-title { font-size: 13px; color: #fff; font-weight: 600; }
+  .notif-body { font-size: 12px; color: rgba(255,255,255,0.55); }
+  .notif-time { margin-left: auto; font-size: 11px; color: rgba(255,255,255,0.35); flex-shrink: 0; }
+
+  /* Home indicator */
+  .home-indicator {
+    position: absolute;
+    bottom: 8px; left: 50%;
+    transform: translateX(-50%);
+    width: 134px; height: 5px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 3px;
+    z-index: 100;
+  }
+
+  /* Tap hint */
+  .tap-hint {
+    position: absolute;
+    bottom: 30px; left: 0; right: 0;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: hint-pulse 2s ease-in-out infinite;
+    z-index: 10;
+  }
+  @keyframes hint-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.9; }
+  }
+
+  /* ============================================================
+     SCREEN 4: CRACKED SCREEN
+  ============================================================ */
+  #screen-crack {
+    background: #000;
+    overflow: hidden;
+    cursor: crosshair;
+  }
+
+  /* The glass canvas fills screen */
+  #crack-canvas {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    z-index: 50;
+    pointer-events: none;
+  }
+
+  /* Background phone screenshot clone */
+  .crack-bg {
+    position: absolute; inset: 0;
+    z-index: 1;
+    background: 
+      radial-gradient(ellipse at 20% 10%, rgba(100,180,255,0.5) 0%, transparent 40%),
+      radial-gradient(ellipse at 80% 90%, rgba(200,100,255,0.4) 0%, transparent 40%),
+      linear-gradient(160deg, #0a0a2e 0%, #1a0a3e 30%, #0d1a4e 60%, #0a2030 100%);
+    filter: blur(0px);
+    transition: filter 0.3s;
+  }
+  .crack-bg.distort { filter: blur(2px) brightness(0.7); }
+
+  /* Crack overlay canvas interacts with touches */
+  #crack-canvas { pointer-events: none; }
+
+  /* Instruction overlay */
+  .crack-instructions {
+    position: absolute;
+    bottom: 60px; left: 0; right: 0;
+    text-align: center;
+    z-index: 200;
+    padding: 0 20px;
+    transition: opacity 1s ease;
+  }
+  .crack-instructions.fade-out { opacity: 0; pointer-events: none; }
+  .crack-inst-inner {
+    display: inline-flex; flex-direction: column;
+    gap: 6px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 14px 20px;
+  }
+  .crack-inst-item {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .crack-inst-item .badge {
+    background: rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--neon-blue);
+    white-space: nowrap;
+  }
+
+  /* Share button */
+  .btn-share {
+    position: absolute;
+    bottom: 20px; right: 20px;
+    z-index: 300;
+    background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+    border: none;
+    border-radius: 50%;
+    width: 52px; height: 52px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(0,212,255,0.4);
+    transition: transform 0.15s;
+  }
+  .btn-share:active { transform: scale(0.9); }
+
+  /* Reset button */
+  .btn-reset {
+    position: absolute;
+    bottom: 20px; left: 20px;
+    z-index: 300;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50%;
+    width: 52px; height: 52px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    backdrop-filter: blur(20px);
+    transition: transform 0.15s;
+  }
+  .btn-reset:active { transform: scale(0.9); }
+
+  /* ============================================================
+     SCREEN 5: BOOT / RESTART ANIMATION
+  ============================================================ */
+  #screen-boot {
+    background: #000;
+    align-items: center;
+    justify-content: center;
+  }
+  .boot-logo {
+    font-size: 80px;
+    filter: drop-shadow(0 0 30px rgba(255,255,255,0.5));
+    animation: boot-fade 0.5s ease-out;
+  }
+  @keyframes boot-fade {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .boot-bar-wrap {
+    margin-top: 30px;
+    width: 120px; height: 3px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .boot-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+    border-radius: 2px;
+    animation: boot-progress 2.5s ease-in-out forwards;
+  }
+  @keyframes boot-progress {
+    0% { width: 0%; }
+    30% { width: 35%; }
+    60% { width: 60%; }
+    80% { width: 80%; }
+    100% { width: 100%; }
+  }
+  .boot-version {
+    margin-top: 12px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 2px;
+  }
+
+  /* ============================================================
+     PRESS HARDER OVERLAY
+  ============================================================ */
+  .press-harder {
+    position: absolute;
+    inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 400;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .press-harder.show { opacity: 1; }
+  .press-harder-text {
+    font-size: clamp(28px, 8vw, 48px);
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 0 30px rgba(255,0,0,0.8), 0 0 60px rgba(255,0,0,0.4);
+    animation: ph-shake 0.1s infinite;
+  }
+  @keyframes ph-shake {
+    0%, 100% { transform: translate(0,0) rotate(0deg); }
+    25% { transform: translate(-2px, 1px) rotate(-0.5deg); }
+    75% { transform: translate(2px, -1px) rotate(0.5deg); }
+  }
+
+  /* ============================================================
+     SCREEN SHAKE
+  ============================================================ */
+  .shake {
+    animation: screen-shake 0.5s cubic-bezier(0.36,0.07,0.19,0.97) both;
+  }
+  @keyframes screen-shake {
+    10%, 90% { transform: translate(-3px, 0); }
+    20%, 80% { transform: translate(5px, -2px); }
+    30%, 50%, 70% { transform: translate(-5px, 2px); }
+    40%, 60% { transform: translate(5px, 0); }
+    100% { transform: translate(0, 0); }
+  }
+
+  /* ============================================================
+     BANNER AD (placeholder)
+  ============================================================ */
+  .ad-banner {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 50px;
+    background: rgba(0,0,0,0.8);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 500;
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: none; /* hidden by default, show on launch screen */
+  }
+
+  /* ============================================================
+     MODAL: PREMIUM CRACK STYLES
+  ============================================================ */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(20px);
+    z-index: 1000;
+    display: flex; align-items: flex-end;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal-sheet {
+    width: 100%;
+    background: linear-gradient(180deg, rgba(20,20,35,0.98), rgba(10,10,20,0.98));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 28px 28px 0 0;
+    padding: 24px 20px 40px;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .modal-overlay.show .modal-sheet { transform: translateY(0); }
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+  .modal-title {
+    font-size: 22px; font-weight: 700;
+    text-align: center; margin-bottom: 6px;
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .modal-sub {
+    font-size: 13px; color: rgba(255,255,255,0.5);
+    text-align: center; margin-bottom: 24px;
+  }
+  .crack-styles-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; margin-bottom: 20px;
+  }
+  .crack-style-card {
+    border-radius: 16px;
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .crack-style-card.active { border-color: var(--neon-blue); }
+  .crack-style-card.locked::after {
+    content: '🔒';
+    position: absolute; top: 8px; right: 8px;
+    font-size: 14px;
+  }
+  .cs-1 { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+  .cs-2 { background: linear-gradient(135deg, #0d0d1a, rgba(0,255,150,0.1)); }
+  .cs-3 { background: linear-gradient(135deg, #1a0d1a, rgba(255,0,200,0.15)); }
+  .cs-4 { background: linear-gradient(135deg, #1a0a0a, rgba(255,50,50,0.15)); }
+  .cs-name { font-size: 13px; font-weight: 700; color: #fff; }
+  .cs-price { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .cs-preview { font-size: 28px; margin-bottom: 6px; }
+  .btn-purchase-all {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    border: none; border-radius: 16px;
+    color: #000; font-size: 15px; font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .btn-no-ads {
+    width: 100%;
+    padding: 14px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .btn-modal-close {
+    position: absolute; top: 20px; right: 20px;
+    background: rgba(255,255,255,0.1);
+    border: none; border-radius: 50%;
+    width: 32px; height: 32px;
+    color: rgba(255,255,255,0.5);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ============================================================
+     SHARE OVERLAY
+  ============================================================ */
+  .share-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    padding: 20px;
+  }
+  .share-overlay.show { opacity: 1; pointer-events: all; }
+  .share-card {
+    background: linear-gradient(160deg, #0a0a2e, #1a0a3e);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 20px;
+    width: 100%; max-width: 320px;
+    text-align: center;
+  }
+  .share-meme-text {
+    font-size: 16px; font-weight: 700;
+    color: var(--neon-blue);
+    margin-bottom: 8px;
+    text-shadow: 0 0 20px rgba(0,212,255,0.5);
+  }
+  .share-sub { font-size: 12px; color: rgba(255,255,255,0.4); }
+  .share-actions { display: flex; gap: 10px; width: 100%; max-width: 320px; }
+  .btn-share-platform {
+    flex: 1; padding: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.05);
+    color: #fff; font-size: 13px; font-weight: 600;
+    cursor: pointer; text-align: center;
+    transition: all 0.2s;
+  }
+  .btn-share-platform:active { background: rgba(255,255,255,0.12); }
+  .btn-share-close {
+    padding: 12px 24px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  /* ============================================================
+     INTERSTITIAL AD
+  ============================================================ */
+  .interstitial-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 900;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    padding: 30px;
+  }
+  .interstitial-overlay.show { opacity: 1; pointer-events: all; }
+  .interstitial-inner {
+    background: linear-gradient(135deg, #111120, #1a1a30);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 30px 24px;
+    width: 100%; max-width: 360px;
+    text-align: center;
+  }
+  .inter-tag { font-size: 10px; color: rgba(255,255,255,0.25); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+  .inter-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .inter-sub { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 24px; }
+  .inter-btn-skip {
+    padding: 14px 32px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .inter-btn-action {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+    border: none; border-radius: 16px;
+    color: #fff; font-size: 15px; font-weight: 700;
+    cursor: pointer;
+  }
+  .inter-countdown { font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 8px; }
+
+  /* ============================================================
+     GLASS SHARD PARTICLE
+  ============================================================ */
+  .glass-shard {
+    position: absolute;
+    pointer-events: none;
+    z-index: 200;
+    opacity: 1;
+    animation: shard-fly var(--dur, 0.8s) ease-out forwards;
+    transform-origin: center;
+    will-change: transform, opacity;
+  }
+  @keyframes shard-fly {
+    0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.9; }
+    100% { transform: translate(var(--tx, 0px), var(--ty, 60px)) rotate(var(--rot, 180deg)) scale(0.1); opacity: 0; }
+  }
+
+  /* Screen flash */
+  .flash-overlay {
+    position: fixed; inset: 0;
+    background: rgba(255,255,255,0.95);
+    z-index: 600;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.05s;
+  }
+  .flash-overlay.flash { animation: flash-anim 0.3s ease-out; }
+  @keyframes flash-anim {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* Loading dots */
+  .loading-dots {
+    display: flex; gap: 6px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .loading-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--neon-blue);
+    animation: dot-pulse 1.4s ease-in-out infinite;
+  }
+  .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dot-pulse {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Crack ripple effect */
+  .crack-ripple {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.6);
+    pointer-events: none;
+    z-index: 300;
+    animation: ripple-expand 0.6s ease-out forwards;
+  }
+  @keyframes ripple-expand {
+    0% { width: 0; height: 0; opacity: 1; transform: translate(-50%, -50%); }
+    100% { width: 100px; height: 100px; opacity: 0; transform: translate(-50%, -50%); }
+  }
+
+  /* Promo chip */
+  .promo-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(0,255,136,0.1);
+    border: 1px solid rgba(0,255,136,0.2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px; color: #00ff88;
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+  }
 </style>
 </head>
 <body>
 
-<!-- ── TOAST ── -->
-<div id="toast"></div>
+<!-- ===================== SCREEN 1: LAUNCH ===================== -->
+<div id="screen-launch" class="screen">
+  <div class="particle-field" id="particles"></div>
 
-<!-- LAUNCH -->
-<div class="screen" id="s-launch">
-  <div class="launch-glow"></div>
-  <div class="launch-emoji">💥</div>
-  <div class="launch-title">CrackScreen</div>
-  <div class="launch-sub">Fool your friends with a shockingly realistic broken screen!</div>
-  <button class="btn-main" id="btn-start">Start Prank 😈</button>
-  <button class="btn-settings" id="btn-open-settings">⚙️ Settings</button>
-  <div class="launch-footer">For entertainment only. No real damage.</div>
-</div>
-
-<!-- COUNTDOWN -->
-<div class="screen hidden" id="s-countdown">
-  <div class="cd-label">Prank starting in</div>
-  <div id="cd-num">3</div>
-  <div class="cd-hint">Hand the phone to your friend 😈</div>
-</div>
-
-<!-- FAKE HOME -->
-<div class="screen hidden" id="s-home">
-  <div class="home-status">
-    <span id="hs-time-small">9:41</span>
-    <span>●●●● WiFi 🔋</span>
-  </div>
-  <div class="home-time" id="hs-time">9:41</div>
-  <div class="home-date" id="hs-date">Monday, February 23</div>
-  <div class="home-icons">
-    <div class="icon-wrap"><div class="icon-box" style="background:linear-gradient(135deg,#29abe2,#006ec0)">📱</div><div class="icon-name">Phone</div></div>
-    <div class="icon-wrap"><div class="icon-box" style="background:linear-gradient(135deg,#3eba46,#1a6e20)">💬</div><div class="icon-name">Messages</div></div>
-    <div class="icon-wrap"><div class="icon-box" style="background:linear-gradient(135deg,#f7941d,#c55000)">📷</div><div class="icon-name">Camera</div></div>
-    <div class="icon-wrap"><div class="icon-box" style="background:linear-gradient(135deg,#5856d6,#3634a3)">🎵</div><div class="icon-name">Music</div></div>
-    <div class="icon-wrap"><div class="icon-box" style="background:linear-gradient(135deg,#ff2d55,#c0003c)">❤️</div><div class="icon-name">Health</div></div>
-    <div class="icon-wrap"><div class="icon-box" style="background:linear-gradient(135deg,#ff9500,#c07000)">🗺️</div><div class="icon-name">Maps</div></div>
-    <div class="icon-wrap"><div class="icon-box" style="background:linear-gradient(135deg,#34aadc,#007aff)">🌐</div><div class="icon-name">Safari</div></div>
-    <div class="icon-wrap"><div class="icon-box" style="background:linear-gradient(135deg,#ffcc02,#e09500)">📧</div><div class="icon-name">Mail</div></div>
-  </div>
-  <div class="home-dock">
-    <div class="icon-box" style="background:linear-gradient(135deg,#29abe2,#006ec0);width:52px;height:52px;font-size:24px">📱</div>
-    <div class="icon-box" style="background:linear-gradient(135deg,#3eba46,#1a6e20);width:52px;height:52px;font-size:24px">💬</div>
-    <div class="icon-box" style="background:linear-gradient(135deg,#34aadc,#007aff);width:52px;height:52px;font-size:24px">🌐</div>
-    <div class="icon-box" style="background:linear-gradient(135deg,#ff9500,#c07000);width:52px;height:52px;font-size:24px">🎵</div>
-  </div>
-</div>
-
-<!-- CRACK SCREEN -->
-<div class="screen hidden" id="s-crack">
-  <canvas id="c-crack"></canvas>
-  <canvas id="c-particles"></canvas>
-  <div class="glass-sheen"></div>
-  <div class="vignette"></div>
-  <div id="tap-hint"><span class="big">☝️</span>Tap to crack the screen!</div>
-  <div id="press-harder">PRESS HARDER! 💥</div>
-  <div id="error-zone"></div>
-  <div id="bottom-bar">
-    <div id="action-bar">
-      <button class="act-btn" id="ab-reset">  <span class="icon">🔄</span>Reset</button>
-      <button class="act-btn" id="ab-restart"><span class="icon">📱</span>Restart</button>
-      <button class="act-btn" id="ab-share">  <span class="icon">📤</span>Share</button>
-      <button class="act-btn" id="ab-settings"><span class="icon">⚙️</span>Settings</button>
-      <button class="act-btn" id="ab-home">   <span class="icon">🏠</span>Home</button>
-    </div>
-    <div id="ad-banner">📢 AD BANNER — Your ad here</div>
-  </div>
-</div>
-
-<!-- BOOT -->
-<div class="screen hidden" id="s-boot">
-  <svg class="boot-logo" viewBox="0 0 64 64" fill="none">
-    <path d="M32 4 C32 4,48 10,54 22 C60 34,56 50,46 56 C38 62,26 62,18 56 C8 50,4 34,10 22 C16 10,32 4,32 4Z" fill="rgba(255,255,255,0.88)"/>
-  </svg>
-  <div class="boot-brand">Loading…</div>
-  <div class="boot-bar-wrap"><div id="boot-bar"></div></div>
-</div>
-
-<!-- SETTINGS -->
-<div class="screen hidden" id="s-settings">
-  <div class="drawer">
-    <div class="drawer-handle"></div>
-    <h2>Settings ⚙️</h2>
-    <div class="section-label">Crack Style</div>
-    <div class="pack-scroll" id="pack-scroll"></div>
-    <div class="section-label">Options</div>
-    <div class="s-row">
-      <div><div class="s-row-label">Sound Effects</div><div class="s-row-sub">Glass crack sounds</div></div>
-      <label class="tog"><input type="checkbox" id="t-sound" checked><span class="tog-track"></span></label>
-    </div>
-    <div class="s-row">
-      <div><div class="s-row-label">Vibration</div><div class="s-row-sub">Haptic feedback</div></div>
-      <label class="tog"><input type="checkbox" id="t-vibrate" checked><span class="tog-track"></span></label>
-    </div>
-    <div class="s-row">
-      <div><div class="s-row-label">Error Messages</div><div class="s-row-sub">Funny damage alerts</div></div>
-      <label class="tog"><input type="checkbox" id="t-errors" checked><span class="tog-track"></span></label>
-    </div>
-    <div class="s-row">
-      <div><div class="s-row-label">Shake to Crack</div><div class="s-row-sub">Motion trigger</div></div>
-      <label class="tog"><input type="checkbox" id="t-shake" checked><span class="tog-track"></span></label>
-    </div>
-    <div class="s-row">
-      <div><div class="s-row-label">Crack Intensity</div><div class="s-row-sub">Lines per tap</div></div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <input type="range" class="s-range" id="r-intensity" min="1" max="10" value="5">
-        <span class="range-val" id="rv">5</span>
+  <div class="launch-content">
+    <!-- Glow rings -->
+    <div style="position:relative; display:flex; align-items:center; justify-content:center; margin-bottom:32px;">
+      <div class="glow-ring"></div>
+      <div class="glow-ring"></div>
+      <!-- Phone SVG -->
+      <div class="phone-icon-wrap" style="margin-bottom:0;">
+        <svg class="phone-icon-svg" viewBox="0 0 140 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Phone body -->
+          <rect x="8" y="4" width="124" height="172" rx="22" fill="url(#phoneGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+          <!-- Screen -->
+          <rect x="14" y="20" width="112" height="148" rx="10" fill="url(#screenGrad)"/>
+          <!-- Dynamic island -->
+          <rect x="52" y="26" width="36" height="12" rx="6" fill="rgba(0,0,0,0.8)"/>
+          <!-- Crack lines -->
+          <line x1="70" y1="40" x2="30" y2="80" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+          <line x1="70" y1="40" x2="110" y2="90" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+          <line x1="30" y1="80" x2="10" y2="130" stroke="rgba(255,255,255,0.7)" stroke-width="1"/>
+          <line x1="110" y1="90" x2="130" y2="140" stroke="rgba(255,255,255,0.7)" stroke-width="1"/>
+          <line x1="70" y1="40" x2="80" y2="160" stroke="rgba(255,255,255,0.5)" stroke-width="0.8"/>
+          <line x1="30" y1="80" x2="100" y2="130" stroke="rgba(255,255,255,0.6)" stroke-width="0.8"/>
+          <line x1="50" y1="100" x2="20" y2="150" stroke="rgba(255,255,255,0.4)" stroke-width="0.7"/>
+          <line x1="90" y1="60" x2="130" y2="100" stroke="rgba(255,255,255,0.5)" stroke-width="0.7"/>
+          <!-- Impact point glow -->
+          <circle cx="70" cy="40" r="6" fill="rgba(255,255,255,0.15)"/>
+          <circle cx="70" cy="40" r="3" fill="rgba(255,255,255,0.4)"/>
+          <!-- Side buttons -->
+          <rect x="132" y="50" width="5" height="20" rx="2.5" fill="rgba(255,255,255,0.2)"/>
+          <rect x="132" y="76" width="5" height="20" rx="2.5" fill="rgba(255,255,255,0.2)"/>
+          <rect x="3" y="60" width="5" height="14" rx="2.5" fill="rgba(255,255,255,0.2)"/>
+          <defs>
+            <linearGradient id="phoneGrad" x1="0" y1="0" x2="140" y2="180" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#2a2a3e"/>
+              <stop offset="100%" stop-color="#1a1a2e"/>
+            </linearGradient>
+            <linearGradient id="screenGrad" x1="14" y1="20" x2="126" y2="168" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#1e1e3f"/>
+              <stop offset="50%" stop-color="#0d1a4e"/>
+              <stop offset="100%" stop-color="#0a1530"/>
+            </linearGradient>
+          </defs>
+        </svg>
       </div>
     </div>
-    <button class="btn-noad" id="btn-noad">💜 Remove Ads Forever — $1.99</button>
-    <button class="btn-close-drawer" id="btn-close-drawer">Done</button>
-  </div>
-</div>
 
-<!-- INTERSTITIAL -->
-<div class="screen hidden" id="s-inter">
-  <h2>⚡ Quick Break</h2>
-  <p>Support us to keep CrackScreen free!</p>
-  <div class="ad-mock">📢 Ad displays here</div>
-  <button class="btn-skip" id="btn-skip-inter">Skip →</button>
-</div>
+    <div class="promo-chip">⚡ 50M+ Pranks Pulled</div>
+    <h1 class="app-title">CrackScreen</h1>
+    <p class="app-subtitle">Fake Broken Screen · 2026</p>
 
-<!-- SHARE -->
-<div class="screen hidden" id="s-share">
-  <div class="share-box">
-    <h2>📤 Share the Prank!</h2>
-    <div id="share-preview"><canvas id="c-share"></canvas></div>
-    <div class="share-btns">
-      <button class="sbtn" id="sb-share">🔗 Share</button>
-      <button class="sbtn" id="sb-copy">📋 Copy</button>
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num">4.9★</div>
+        <div class="stat-label">Rating</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">50M+</div>
+        <div class="stat-label">Downloads</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">#1</div>
+        <div class="stat-label">Prank App</div>
+      </div>
     </div>
-    <button class="btn-close-share" id="btn-close-share">Close</button>
+
+    <button class="btn-start" id="btn-start" onclick="startCountdown()">
+      <span>💥 Start Prank</span>
+    </button>
+
+    <div class="settings-row">
+      <button class="btn-setting" onclick="openModal()">
+        <span class="icon">💎</span>Crack Styles
+      </button>
+      <button class="btn-setting" id="install-btn" onclick="installPWA()" style="display:none;">
+        <span class="icon">📲</span>Install App
+      </button>
+      <button class="btn-setting" onclick="showSettings()">
+        <span class="icon">⚙️</span>Settings
+      </button>
+    </div>
+
+    <div class="premium-badge" onclick="openModal()">
+      👑 Go Premium — Remove Ads Forever · $1.99
+    </div>
   </div>
 </div>
 
+<!-- ===================== SCREEN 2: COUNTDOWN ===================== -->
+<div id="screen-countdown" class="screen hidden">
+  <div class="countdown-inner">
+    <div class="countdown-label">Prank starts in</div>
+    <div class="countdown-num" id="countdown-num">3</div>
+    <div class="countdown-hint">Hold phone out to your friend<br>then let them tap the screen!</div>
+    <div class="loading-dots">
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 3: HOME ===================== -->
+<div id="screen-home" class="screen hidden" onclick="goToCrackFromHome()">
+  <div class="wallpaper"></div>
+
+  <!-- Dynamic Island -->
+  <div class="dynamic-island">
+    <div class="di-speaker"></div>
+    <div class="di-camera"></div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <div class="status-time" id="status-time">9:41</div>
+    <div class="status-icons">
+      <span class="status-icon">▲▲▲</span>
+      <span class="status-icon">WiFi</span>
+      <div class="battery">
+        <div class="battery-body"><div class="battery-fill"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lock clock -->
+  <div class="lock-clock">
+    <div class="lock-time" id="lock-time">9:41</div>
+    <div class="lock-date" id="lock-date">Monday, February 23</div>
+  </div>
+
+  <!-- Weather widget -->
+  <div class="weather-widget">
+    <div class="weather-icon">⛅</div>
+    <div class="weather-info">
+      <div class="weather-temp">22°</div>
+      <div class="weather-cond">Partly Cloudy</div>
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="notif-stack">
+    <div class="notif-card">
+      <div class="notif-app-icon" style="background:linear-gradient(135deg,#1da1f2,#0d8ecf)">💬</div>
+      <div class="notif-content">
+        <div class="notif-app">Messages</div>
+        <div class="notif-title">Sarah 🌟</div>
+        <div class="notif-body">haha no way you have to see this 😂</div>
+      </div>
+      <div class="notif-time">now</div>
+    </div>
+    <div class="notif-card">
+      <div class="notif-app-icon" style="background:linear-gradient(135deg,#ee2a7b,#f77737)">📸</div>
+      <div class="notif-content">
+        <div class="notif-app">Instagram</div>
+        <div class="notif-title">12 people liked your photo</div>
+        <div class="notif-body">@mike.dev and 11 others</div>
+      </div>
+      <div class="notif-time">2m</div>
+    </div>
+  </div>
+
+  <!-- Tap hint -->
+  <div class="tap-hint">Tap to unlock</div>
+
+  <!-- Home indicator -->
+  <div class="home-indicator"></div>
+</div>
+
+<!-- ===================== SCREEN 4: CRACKED ===================== -->
+<div id="screen-crack" class="screen hidden">
+  <div class="crack-bg" id="crack-bg"></div>
+
+  <!-- Same lock-screen elements underneath -->
+  <div class="dynamic-island" style="z-index:55; pointer-events:none;">
+    <div class="di-speaker"></div>
+    <div class="di-camera"></div>
+  </div>
+  <div class="status-bar" style="z-index:55; pointer-events:none;">
+    <div class="status-time" id="crack-status-time">9:41</div>
+    <div class="status-icons">
+      <span class="status-icon">▲▲▲</span>
+      <span class="status-icon">WiFi</span>
+      <div class="battery">
+        <div class="battery-body"><div class="battery-fill"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="lock-clock" style="z-index:55; pointer-events:none;">
+    <div class="lock-time" id="crack-lock-time">9:41</div>
+    <div class="lock-date" id="crack-lock-date">Monday, February 23</div>
+  </div>
+
+  <!-- Crack canvas -->
+  <canvas id="crack-canvas"></canvas>
+
+  <!-- Press harder overlay -->
+  <div class="press-harder" id="press-harder">
+    <div class="press-harder-text">PRESS HARDER</div>
+  </div>
+
+  <!-- Instructions -->
+  <div class="crack-instructions" id="crack-instructions">
+    <div class="crack-inst-inner">
+      <div class="crack-inst-item"><span class="badge">Tap</span> Crack glass</div>
+      <div class="crack-inst-item"><span class="badge">Hold</span> Press harder</div>
+      <div class="crack-inst-item"><span class="badge">Shake</span> Shatter!</div>
+      <div class="crack-inst-item"><span class="badge">2x Tap</span> Reboot</div>
+    </div>
+  </div>
+
+  <!-- Action buttons -->
+  <button class="btn-share" onclick="showShare()" title="Share">📤</button>
+  <button class="btn-reset" onclick="resetPrank()" title="Reset">🔄</button>
+</div>
+
+<!-- ===================== SCREEN 5: BOOT ===================== -->
+<div id="screen-boot" class="screen hidden">
+  <div class="boot-logo">🍎</div>
+  <div class="boot-bar-wrap">
+    <div class="boot-bar-fill" id="boot-bar"></div>
+  </div>
+  <div class="boot-version">iOS 19.2 • CrackOS</div>
+</div>
+
+<!-- ===================== FLASH OVERLAY ===================== -->
+<div class="flash-overlay" id="flash-overlay"></div>
+
+<!-- ===================== PRESS HARDER is in screen-crack ===================== -->
+
+<!-- ===================== MODAL: CRACK STYLES ===================== -->
+<div class="modal-overlay" id="modal-styles" onclick="handleModalClick(event)">
+  <div class="modal-sheet">
+    <button class="btn-modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-handle"></div>
+    <div class="modal-title">💎 Crack Style Pack</div>
+    <div class="modal-sub">Choose your glass personality</div>
+    <div class="crack-styles-grid">
+      <div class="crack-style-card cs-1 active" onclick="selectStyle(0, this)">
+        <div class="cs-preview">🔲</div>
+        <div class="cs-name">Classic</div>
+        <div class="cs-price">Free</div>
+      </div>
+      <div class="crack-style-card cs-2 locked" onclick="selectStyle(1, this)">
+        <div class="cs-preview">💚</div>
+        <div class="cs-name">Neon Matrix</div>
+        <div class="cs-price">$0.99</div>
+      </div>
+      <div class="crack-style-card cs-3 locked" onclick="selectStyle(2, this)">
+        <div class="cs-preview">🩸</div>
+        <div class="cs-name">Blood Glass</div>
+        <div class="cs-price">$0.99</div>
+      </div>
+      <div class="crack-style-card cs-4 locked" onclick="selectStyle(3, this)">
+        <div class="cs-preview">🌈</div>
+        <div class="cs-name">Holographic</div>
+        <div class="cs-price">$1.99</div>
+      </div>
+    </div>
+    <button class="btn-purchase-all" onclick="purchaseAll()">👑 Get All Styles — $2.99</button>
+    <button class="btn-no-ads" onclick="purchaseNoAds()">Remove Ads Forever — $1.99</button>
+  </div>
+</div>
+
+<!-- ===================== SHARE OVERLAY ===================== -->
+<div class="share-overlay" id="share-overlay">
+  <div class="share-card">
+    <div style="font-size:48px; margin-bottom:12px;">💥</div>
+    <div class="share-meme-text">"My friend literally dropped<br>my phone!! 😱😭"</div>
+    <div class="share-sub">CrackScreen App · The #1 Prank of 2026</div>
+  </div>
+  <div class="share-actions">
+    <button class="btn-share-platform" onclick="nativeShare()">📤 Share</button>
+    <button class="btn-share-platform" onclick="copyLink()">🔗 Copy</button>
+  </div>
+  <button class="btn-share-close" onclick="hideShare()">Close</button>
+</div>
+
+<!-- ===================== INTERSTITIAL ===================== -->
+<div class="interstitial-overlay" id="interstitial">
+  <div class="interstitial-inner">
+    <div class="inter-tag">Sponsored</div>
+    <div class="inter-title" style="background:linear-gradient(135deg,var(--neon-blue),var(--neon-purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">
+      Upgrade to Premium
+    </div>
+    <div class="inter-sub">Remove all ads & unlock 4 exclusive crack styles for one-time $2.99</div>
+    <button class="inter-btn-action" onclick="purchaseAll()">Unlock Everything — $2.99</button>
+    <button class="inter-btn-skip" id="inter-skip" onclick="closeInterstitial()">Skip (5)</button>
+  </div>
+</div>
+
+<!-- ===================== AUDIO CONTEXT (inline) ===================== -->
 <script>
-(function() {
-'use strict';
+/* ============================================================
+   AUDIO ENGINE — Procedural sounds via Web Audio API
+============================================================ */
+let audioCtx = null;
 
-/* ── STATE ── */
-var S = { sound:true, vibrate:true, errors:true, shake:true, intensity:5, pack:'classic' };
-
-var PACKS = [
-  { id:'classic', em:'🔲', nm:'Classic', pr:null,   c:['rgba(255,255,255,0.92)','rgba(190,190,190,0.7)'] },
-  { id:'heavy',   em:'💥', nm:'Heavy',   pr:null,   c:['rgba(255,255,255,0.98)','rgba(155,155,155,0.8)'] },
-  { id:'neon',    em:'🌈', nm:'Neon',    pr:'$0.99',c:['rgba(0,255,200,0.9)',   'rgba(200,0,255,0.75)'] },
-  { id:'blood',   em:'🩸', nm:'Blood',   pr:'$0.99',c:['rgba(255,60,40,0.92)', 'rgba(160,0,0,0.75)'] },
-  { id:'gold',    em:'✨', nm:'Gold',    pr:'$1.99',c:['rgba(255,215,0,0.95)', 'rgba(180,130,0,0.75)'] },
-];
-
-var cracks=[], particles=[], crackCount=0, prankCount=0;
-var audioCtx=null;
-var holdTimer=null, isHolding=false;
-var raf=null;
-var prevScreen='s-launch';
-var lastTap=0;
-var autoBootTimer=null;
-
-/* ── SHOW SCREEN ── */
-function show(id) {
-  var all = document.querySelectorAll('.screen');
-  for (var i=0; i<all.length; i++) all[i].classList.add('hidden');
-  var el = document.getElementById(id);
-  if (el) el.classList.remove('hidden');
-}
-
-/* ── TOAST ── */
-var toastTimer=null;
-function toast(msg, dur) {
-  dur = dur||3000;
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.display = 'block';
-  t.style.opacity = '1';
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(function(){
-    t.style.transition = 'opacity 0.3s';
-    t.style.opacity = '0';
-    setTimeout(function(){ t.style.display='none'; t.style.transition=''; }, 300);
-  }, dur);
-}
-
-/* ── AUDIO ── */
 function getAudioCtx() {
   if (!audioCtx) {
-    try { audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){}
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
-function crackSound(intensity) {
-  if (!S.sound) return;
+
+function playCrackSound(intensity = 1) {
   try {
-    var ctx = getAudioCtx();
-    if (!ctx) return;
-    if (ctx.state === 'suspended') ctx.resume();
-    var dur = 0.12 + intensity*0.03;
-    var n = Math.floor(ctx.sampleRate * dur);
-    var buf = ctx.createBuffer(1, n, ctx.sampleRate);
-    var d = buf.getChannelData(0);
-    for (var i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n)*(0.5+intensity*0.05);
-    var src = ctx.createBufferSource(); src.buffer=buf;
-    var gn = ctx.createGain();
-    gn.gain.setValueAtTime(0.7, ctx.currentTime);
-    gn.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
-    var bp = ctx.createBiquadFilter(); bp.type='bandpass';
-    bp.frequency.value=3000+Math.random()*2000; bp.Q.value=0.5;
-    src.connect(bp); bp.connect(gn); gn.connect(ctx.destination);
-    src.start(); src.stop(ctx.currentTime+dur);
-    // thud
-    var osc=ctx.createOscillator(), g2=ctx.createGain();
-    osc.frequency.setValueAtTime(110,ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(35,ctx.currentTime+0.1);
-    g2.gain.setValueAtTime(0.4,ctx.currentTime);
-    g2.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.12);
-    osc.connect(g2); g2.connect(ctx.destination);
-    osc.start(); osc.stop(ctx.currentTime+0.12);
-  } catch(e){}
-}
+    const ctx = getAudioCtx();
+    const duration = 0.15 + intensity * 0.1;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.8 * intensity, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    gain.connect(ctx.destination);
 
-/* ── VIBRATE ── */
-function vib(p) { if (S.vibrate && navigator.vibrate) try{navigator.vibrate(p);}catch(e){} }
-
-/* ── CANVAS ── */
-var cC, cCx, pC, pCx, cW, cH;
-function setupCanvas() {
-  cC = document.getElementById('c-crack');
-  pC = document.getElementById('c-particles');
-  cCx = cC.getContext('2d');
-  pCx = pC.getContext('2d');
-  doResize();
-}
-function doResize() {
-  cW = window.innerWidth; cH = window.innerHeight;
-  cC.width=cW; cC.height=cH;
-  pC.width=cW; pC.height=cH;
-  redrawAll();
-}
-
-/* ── GET PACK ── */
-function getPack() {
-  for (var i=0;i<PACKS.length;i++) {
-    if (PACKS[i].id===S.pack && !PACKS[i].pr) return PACKS[i];
-  }
-  return PACKS[0];
-}
-
-/* ── CRACK ENGINE ── */
-function addCrack(x,y,count) {
-  var pk = getPack();
-  var lines=[];
-  var num = 3 + Math.round(count);
-  for (var i=0;i<num;i++) {
-    var a = Math.random()*Math.PI*2;
-    var len = 55 + Math.random()*cH*0.22;
-    lines.push(buildLine(x,y,a,len,4));
-  }
-  var g={x:x,y:y,lines:lines,pk:pk};
-  cracks.push(g);
-  drawGroup(g);
-}
-
-function buildLine(x,y,a,len,depth) {
-  if (depth<=0||len<8) return [];
-  var segs=[], steps=4+Math.floor(Math.random()*4);
-  var cx=x, cy=y, ca=a;
-  var sl=len/steps;
-  for (var i=0;i<steps;i++) {
-    ca += (Math.random()-0.5)*0.5;
-    var nx=cx+Math.cos(ca)*sl, ny=cy+Math.sin(ca)*sl;
-    segs.push({x1:cx,y1:cy,x2:nx,y2:ny,w:0.4+(1-i/steps)*1.8*(depth/4)});
-    if (Math.random()<0.35 && depth>1) {
-      var sub=buildLine(nx,ny,ca+(Math.random()-0.5)*1.3,len*0.45,depth-1);
-      for (var j=0;j<sub.length;j++) segs.push(sub[j]);
+    // White noise burst
+    const bufferSize = ctx.sampleRate * duration;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
     }
-    cx=nx; cy=ny;
-  }
-  return segs;
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+
+    // Bandpass filter for glass-like crack
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 3000 + Math.random() * 2000;
+    filter.Q.value = 0.5;
+
+    src.connect(filter);
+    filter.connect(gain);
+    src.start();
+
+    // Add a sharp click
+    const osc = ctx.createOscillator();
+    const oGain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(800 + Math.random() * 400, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.05);
+    oGain.gain.setValueAtTime(0.3 * intensity, ctx.currentTime);
+    oGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+    osc.connect(oGain);
+    oGain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.05);
+  } catch(e) {}
 }
 
-function drawGroup(g) {
-  var c = g.pk.c;
-  for (var li=0;li<g.lines.length;li++) {
-    var segs=g.lines[li];
-    for (var si=0;si<segs.length;si++) {
-      var s=segs[si];
-      // shadow
-      cCx.save();
-      cCx.strokeStyle='rgba(0,0,0,0.85)';
-      cCx.lineWidth=s.w+2; cCx.lineCap='round';
-      cCx.beginPath(); cCx.moveTo(s.x1+1,s.y1+1); cCx.lineTo(s.x2+1,s.y2+1); cCx.stroke();
-      cCx.restore();
-      // crack
-      cCx.save();
-      var gr=cCx.createLinearGradient(s.x1,s.y1,s.x2,s.y2);
-      gr.addColorStop(0,c[0]); gr.addColorStop(1,c[1]);
-      cCx.strokeStyle=gr; cCx.lineWidth=s.w; cCx.lineCap='round';
-      cCx.shadowColor='rgba(255,255,255,0.3)'; cCx.shadowBlur=2;
-      cCx.beginPath(); cCx.moveTo(s.x1,s.y1); cCx.lineTo(s.x2,s.y2); cCx.stroke();
-      cCx.restore();
+function playShatterSound() {
+  try {
+    const ctx = getAudioCtx();
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => playCrackSound(0.5 + Math.random() * 0.5), i * 40);
     }
-  }
-  // shatter polygon
-  var pts=5+Math.floor(Math.random()*5);
-  cCx.save();
-  cCx.fillStyle='rgba(255,255,255,0.05)';
-  cCx.strokeStyle='rgba(255,255,255,0.22)';
-  cCx.lineWidth=0.5;
-  cCx.beginPath();
-  for (var pi=0;pi<pts;pi++) {
-    var pa=(pi/pts)*Math.PI*2, pr=10+Math.random()*18;
-    var ppx=g.x+Math.cos(pa)*pr, ppy=g.y+Math.sin(pa)*pr;
-    if (pi===0) cCx.moveTo(ppx,ppy); else cCx.lineTo(ppx,ppy);
-  }
-  cCx.closePath(); cCx.fill(); cCx.stroke();
-  cCx.restore();
-  // blotch
-  var rg=cCx.createRadialGradient(g.x,g.y,0,g.x,g.y,22);
-  rg.addColorStop(0,'rgba(0,0,0,0.9)');
-  rg.addColorStop(0.5,'rgba(0,0,0,0.35)');
-  rg.addColorStop(1,'rgba(0,0,0,0)');
-  cCx.fillStyle=rg;
-  cCx.beginPath(); cCx.arc(g.x,g.y,22,0,Math.PI*2); cCx.fill();
+    // Deep bass thud
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(80, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(20, ctx.currentTime + 0.3);
+    gain.gain.setValueAtTime(1, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.3);
+  } catch(e) {}
 }
 
-function redrawAll() {
-  if (!cCx) return;
-  cCx.clearRect(0,0,cW,cH);
-  for (var i=0;i<cracks.length;i++) drawGroup(cracks[i]);
+function playBootSound() {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.4);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.6);
+  } catch(e) {}
 }
 
-/* ── PARTICLES ── */
-function spawnParticles(x,y,n) {
-  for (var i=0;i<n;i++) {
-    particles.push({
-      x:x, y:y,
-      vx:(Math.random()-0.5)*6,
-      vy:-2-Math.random()*5,
-      s:1+Math.random()*4,
-      rot:Math.random()*Math.PI*2,
-      rv:(Math.random()-0.5)*0.2,
-      life:1.0,
-      decay:0.016+Math.random()*0.022
+/* ============================================================
+   HAPTIC ENGINE
+============================================================ */
+function vibrate(pattern) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
+function hapticCrack() { vibrate([50, 10, 30]); }
+function hapticShatter() { vibrate([100, 20, 80, 20, 60, 20, 40]); }
+function hapticLight() { vibrate(20); }
+
+/* ============================================================
+   PARTICLE FIELD (launch screen)
+============================================================ */
+function createParticles() {
+  const field = document.getElementById('particles');
+  const colors = ['#00d4ff', '#b300ff', '#ff0080', '#00ff88', '#ffffff'];
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 2 + Math.random() * 4;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    p.style.cssText = `
+      left: ${Math.random() * 100}%;
+      width: ${size}px; height: ${size}px;
+      background: ${color};
+      box-shadow: 0 0 ${size * 2}px ${color};
+      animation-duration: ${5 + Math.random() * 10}s;
+      animation-delay: ${Math.random() * 10}s;
+    `;
+    field.appendChild(p);
+  }
+}
+createParticles();
+
+/* ============================================================
+   CLOCK UPDATE
+============================================================ */
+function updateClocks() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+  const timeStr = `${h}:${m}`;
+  const timeStrS = `${h}:${m}:${s}`;
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dateStr = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+
+  document.getElementById('status-time').textContent = timeStr;
+  document.getElementById('lock-time').textContent = timeStr;
+  document.getElementById('lock-date').textContent = dateStr;
+  document.getElementById('crack-status-time').textContent = timeStr;
+  document.getElementById('crack-lock-time').textContent = timeStr;
+  document.getElementById('crack-lock-date').textContent = dateStr;
+}
+updateClocks();
+setInterval(updateClocks, 1000);
+
+/* ============================================================
+   SCREEN MANAGEMENT
+============================================================ */
+let currentScreen = 'screen-launch';
+
+function showScreen(id) {
+  document.getElementById(currentScreen).classList.add('hidden');
+  document.getElementById(id).classList.remove('hidden');
+  currentScreen = id;
+}
+
+/* ============================================================
+   COUNTDOWN LOGIC
+============================================================ */
+let prankCount = 0;
+
+function startCountdown() {
+  hapticLight();
+  showScreen('screen-countdown');
+  let count = 3;
+  document.getElementById('countdown-num').textContent = count;
+
+  const interval = setInterval(() => {
+    count--;
+    hapticLight();
+    if (count <= 0) {
+      clearInterval(interval);
+      document.getElementById('countdown-num').textContent = 'GO!';
+      document.getElementById('countdown-num').style.fontSize = 'clamp(80px, 25vw, 140px)';
+      setTimeout(() => {
+        showScreen('screen-home');
+        document.getElementById('countdown-num').style.fontSize = '';
+      }, 700);
+    } else {
+      document.getElementById('countdown-num').textContent = count;
+    }
+  }, 1000);
+}
+
+function goToCrackFromHome() {
+  prankCount++;
+  initCrackScreen();
+  showScreen('screen-crack');
+  // Show interstitial every 4 pranks
+  if (prankCount % 4 === 0) {
+    setTimeout(showInterstitial, 2000);
+  }
+}
+
+function resetPrank() {
+  clearCracks();
+  showScreen('screen-launch');
+  document.getElementById('crack-instructions').classList.remove('fade-out');
+  pressHarderTimer = null;
+  hidePresHarder();
+}
+
+/* ============================================================
+   CRACK CANVAS ENGINE
+============================================================ */
+let crackCanvas, crackCtx;
+let cracks = [];
+let currentStyle = 0;
+let tapCount = 0;
+let instructionsFaded = false;
+
+const crackStyles = [
+  { primary: 'rgba(255,255,255,0.9)', secondary: 'rgba(255,255,255,0.4)', glow: 'rgba(255,255,255,0.6)', shardColor: 'rgba(200,220,255,0.6)' },
+  { primary: 'rgba(0,255,136,0.9)', secondary: 'rgba(0,255,136,0.4)', glow: 'rgba(0,255,136,0.6)', shardColor: 'rgba(0,255,136,0.5)' },
+  { primary: 'rgba(255,50,50,0.9)', secondary: 'rgba(200,0,0,0.5)', glow: 'rgba(255,0,0,0.6)', shardColor: 'rgba(255,80,80,0.5)' },
+  { primary: 'rgba(255,0,200,0.9)', secondary: 'rgba(100,0,255,0.5)', glow: 'rgba(200,0,255,0.6)', shardColor: 'rgba(255,100,255,0.5)' },
+];
+
+function initCrackScreen() {
+  crackCanvas = document.getElementById('crack-canvas');
+  crackCtx = crackCanvas.getContext('2d');
+  resizeCrackCanvas();
+  cracks = [];
+  renderCracks();
+  tapCount = 0;
+  instructionsFaded = false;
+}
+
+function resizeCrackCanvas() {
+  crackCanvas.width = window.innerWidth;
+  crackCanvas.height = window.innerHeight;
+}
+
+window.addEventListener('resize', () => {
+  if (crackCanvas) resizeCrackCanvas();
+});
+
+function clearCracks() {
+  cracks = [];
+  if (crackCtx) crackCtx.clearRect(0, 0, crackCanvas.width, crackCanvas.height);
+}
+
+/* Generate a branching crack from a point */
+function generateCrack(x, y, intensity = 1) {
+  const numBranches = Math.floor(3 + Math.random() * 4 + intensity * 3);
+  const cracksOut = [];
+
+  for (let b = 0; b < numBranches; b++) {
+    const angle = (Math.PI * 2 * b / numBranches) + (Math.random() - 0.5) * 0.8;
+    const points = [{x, y}];
+    let curX = x, curY = y;
+    let curAngle = angle;
+    const length = (80 + Math.random() * 120) * intensity;
+    const numSegments = Math.floor(4 + Math.random() * 6);
+    const segLength = length / numSegments;
+
+    for (let s = 0; s < numSegments; s++) {
+      curAngle += (Math.random() - 0.5) * 0.6;
+      curX += Math.cos(curAngle) * segLength;
+      curY += Math.sin(curAngle) * segLength;
+      points.push({x: curX, y: curY});
+
+      // Sub-branch
+      if (Math.random() < 0.4 && s > 1) {
+        const subAngle = curAngle + (Math.random() > 0.5 ? 0.4 : -0.4) + (Math.random() - 0.5) * 0.3;
+        const subLen = segLength * (0.3 + Math.random() * 0.4);
+        const subPoints = [{x: curX, y: curY}, {
+          x: curX + Math.cos(subAngle) * subLen,
+          y: curY + Math.sin(subAngle) * subLen
+        }];
+        cracksOut.push({ points: subPoints, alpha: 0, targetAlpha: 0.6 + Math.random() * 0.3 });
+      }
+    }
+    cracksOut.push({ points, alpha: 0, targetAlpha: 0.8 + Math.random() * 0.2 });
+  }
+
+  // Impact circle
+  cracksOut.push({ type: 'circle', x, y, radius: 4 + Math.random() * 4, alpha: 0, targetAlpha: 1 });
+
+  cracks.push(...cracksOut);
+}
+
+function renderCracks() {
+  if (!crackCtx) return;
+  const style = crackStyles[currentStyle];
+  crackCtx.clearRect(0, 0, crackCanvas.width, crackCanvas.height);
+
+  // Animate alpha
+  let needsUpdate = false;
+  cracks.forEach(crack => {
+    if (crack.alpha < crack.targetAlpha) {
+      crack.alpha = Math.min(crack.alpha + 0.08, crack.targetAlpha);
+      needsUpdate = true;
+    }
+  });
+
+  cracks.forEach(crack => {
+    if (crack.type === 'circle') {
+      crackCtx.save();
+      crackCtx.beginPath();
+      crackCtx.arc(crack.x, crack.y, crack.radius, 0, Math.PI * 2);
+      crackCtx.fillStyle = `rgba(255,255,255,${crack.alpha})`;
+      crackCtx.shadowColor = style.glow;
+      crackCtx.shadowBlur = 10;
+      crackCtx.fill();
+      crackCtx.restore();
+      return;
+    }
+
+    if (!crack.points || crack.points.length < 2) return;
+
+    // Draw glow layer
+    crackCtx.save();
+    crackCtx.beginPath();
+    crackCtx.moveTo(crack.points[0].x, crack.points[0].y);
+    for (let i = 1; i < crack.points.length; i++) {
+      crackCtx.lineTo(crack.points[i].x, crack.points[i].y);
+    }
+    crackCtx.strokeStyle = style.glow.replace(')', `, ${crack.alpha * 0.5})`).replace('rgba(', 'rgba(');
+    crackCtx.lineWidth = 4;
+    crackCtx.shadowColor = style.glow;
+    crackCtx.shadowBlur = 12;
+    crackCtx.lineCap = 'round';
+    crackCtx.stroke();
+
+    // Draw main crack
+    crackCtx.beginPath();
+    crackCtx.moveTo(crack.points[0].x, crack.points[0].y);
+    for (let i = 1; i < crack.points.length; i++) {
+      crackCtx.lineTo(crack.points[i].x, crack.points[i].y);
+    }
+    crackCtx.strokeStyle = style.primary.replace(')', `, ${crack.alpha})`).replace('rgba(', 'rgba(');
+    crackCtx.lineWidth = 1.5;
+    crackCtx.shadowBlur = 0;
+    crackCtx.stroke();
+
+    crackCtx.restore();
+  });
+
+  // Add a dark vignette overlay as cracks build up
+  const crackDensity = Math.min(cracks.length / 60, 1);
+  if (crackDensity > 0.1) {
+    const grad = crackCtx.createRadialGradient(
+      crackCanvas.width/2, crackCanvas.height/2, crackCanvas.width * 0.1,
+      crackCanvas.width/2, crackCanvas.height/2, crackCanvas.width * 0.8
+    );
+    grad.addColorStop(0, 'rgba(0,0,0,0)');
+    grad.addColorStop(1, `rgba(0,0,0,${crackDensity * 0.4})`);
+    crackCtx.fillStyle = grad;
+    crackCtx.fillRect(0, 0, crackCanvas.width, crackCanvas.height);
+  }
+
+  if (needsUpdate) requestAnimationFrame(renderCracks);
+}
+
+/* Spawn glass shard particles */
+function spawnShards(x, y, count = 6) {
+  const screen = document.getElementById('screen-crack');
+  const style = crackStyles[currentStyle];
+
+  for (let i = 0; i < count; i++) {
+    const shard = document.createElement('div');
+    shard.className = 'glass-shard';
+    const size = 4 + Math.random() * 12;
+    const tx = (Math.random() - 0.5) * 160;
+    const ty = 40 + Math.random() * 120;
+    const rot = (Math.random() - 0.5) * 720;
+    const dur = 0.5 + Math.random() * 0.5;
+
+    // Create triangle/polygon shape via clip-path
+    const shapes = [
+      'polygon(50% 0%, 0% 100%, 100% 100%)',
+      'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+      'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'
+    ];
+
+    shard.style.cssText = `
+      left: ${x}px; top: ${y}px;
+      width: ${size}px; height: ${size}px;
+      background: ${style.shardColor};
+      clip-path: ${shapes[Math.floor(Math.random() * shapes.length)]};
+      --tx: ${tx}px; --ty: ${ty}px; --rot: ${rot}deg; --dur: ${dur}s;
+      box-shadow: 0 0 6px rgba(200,230,255,0.4);
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(255,255,255,0.3);
+    `;
+    screen.appendChild(shard);
+    setTimeout(() => shard.remove(), dur * 1000 + 100);
+  }
+}
+
+/* Add crack ripple visual */
+function spawnRipple(x, y) {
+  const screen = document.getElementById('screen-crack');
+  const ripple = document.createElement('div');
+  ripple.className = 'crack-ripple';
+  ripple.style.cssText = `left: ${x}px; top: ${y}px;`;
+  screen.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 700);
+}
+
+/* ============================================================
+   TOUCH/CLICK EVENTS ON CRACK SCREEN
+============================================================ */
+let pressTimer = null;
+let pressHarderTimer = null;
+let lastTapTime = 0;
+let longPressLevel = 0;
+
+function hidePresHarder() {
+  document.getElementById('press-harder').classList.remove('show');
+}
+
+document.getElementById('screen-crack').addEventListener('touchstart', handleCrackTouchStart, { passive: false });
+document.getElementById('screen-crack').addEventListener('touchend', handleCrackTouchEnd, { passive: false });
+document.getElementById('screen-crack').addEventListener('mousedown', (e) => {
+  // ignore buttons
+  if (e.target.classList.contains('btn-share') || e.target.classList.contains('btn-reset')) return;
+  handleCrackTouchStart({ touches: [e], preventDefault: () => {} });
+});
+document.getElementById('screen-crack').addEventListener('mouseup', (e) => {
+  handleCrackTouchEnd({ touches: [e] });
+});
+
+function handleCrackTouchStart(e) {
+  e.preventDefault();
+  const touch = e.touches[0];
+  const x = touch.clientX;
+  const y = touch.clientY;
+
+  // Double tap detection
+  const now = Date.now();
+  if (now - lastTapTime < 350) {
+    lastTapTime = 0;
+    triggerReboot(x, y);
+    return;
+  }
+  lastTapTime = now;
+
+  // Long press for "press harder"
+  pressTimer = setTimeout(() => {
+    longPressLevel++;
+    document.getElementById('press-harder').classList.add('show');
+    generateCrack(x, y, 0.5 + longPressLevel * 0.3);
+    playCrackSound(0.5 + longPressLevel * 0.2);
+    hapticCrack();
+    renderCracks();
+    spawnShards(x, y, 3 + longPressLevel);
+    pressHarderTimer = setInterval(() => {
+      generateCrack(x + (Math.random()-0.5)*40, y + (Math.random()-0.5)*40, 0.4);
+      renderCracks();
+      playCrackSound(0.3);
+      hapticLight();
+    }, 300);
+  }, 400);
+
+  // Fade instructions after first tap
+  if (!instructionsFaded) {
+    instructionsFaded = true;
+    setTimeout(() => {
+      document.getElementById('crack-instructions').classList.add('fade-out');
+    }, 1500);
+  }
+}
+
+function handleCrackTouchEnd(e) {
+  clearTimeout(pressTimer);
+  if (pressHarderTimer) { clearInterval(pressHarderTimer); pressHarderTimer = null; }
+  hidePresHarder();
+  longPressLevel = 0;
+
+  const touch = e.changedTouches ? e.changedTouches[0] : (e.touches && e.touches[0]);
+  if (!touch) return;
+
+  const x = touch.clientX;
+  const y = touch.clientY;
+  tapCount++;
+
+  generateCrack(x, y, 0.8 + Math.min(tapCount * 0.05, 0.8));
+  playCrackSound(0.7 + Math.random() * 0.3);
+  hapticCrack();
+  renderCracks();
+  spawnShards(x, y, 5);
+  spawnRipple(x, y);
+
+  // Progressive damage to background
+  const crackIntensity = Math.min(tapCount / 15, 1);
+  const bg = document.getElementById('crack-bg');
+  bg.style.filter = `blur(${crackIntensity * 3}px) brightness(${1 - crackIntensity * 0.4})`;
+}
+
+/* ============================================================
+   SHAKE TO SHATTER
+============================================================ */
+let lastShake = 0;
+let shakeThreshold = 18;
+
+function handleMotion(event) {
+  const acc = event.accelerationIncludingGravity;
+  if (!acc) return;
+  const now = Date.now();
+  const magnitude = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
+
+  if (magnitude > shakeThreshold && now - lastShake > 1200 && currentScreen === 'screen-crack') {
+    lastShake = now;
+    triggerMassiveShatter();
+  }
+}
+
+window.addEventListener('devicemotion', handleMotion, { passive: true });
+
+function triggerMassiveShatter() {
+  playShatterSound();
+  hapticShatter();
+
+  // Flash
+  const flash = document.getElementById('flash-overlay');
+  flash.classList.add('flash');
+  setTimeout(() => flash.classList.remove('flash'), 400);
+
+  // Screen shake
+  document.getElementById('screen-crack').classList.add('shake');
+  setTimeout(() => document.getElementById('screen-crack').classList.remove('shake'), 600);
+
+  // Massive cracks everywhere
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const impactPoints = 5 + Math.floor(Math.random() * 4);
+  for (let i = 0; i < impactPoints; i++) {
+    setTimeout(() => {
+      const x = 0.1 * w + Math.random() * 0.8 * w;
+      const y = 0.1 * h + Math.random() * 0.8 * h;
+      generateCrack(x, y, 2);
+      spawnShards(x, y, 12);
+      spawnRipple(x, y);
+    }, i * 80);
+  }
+  setTimeout(renderCracks, 0);
+
+  // Max distort bg
+  document.getElementById('crack-bg').style.filter = 'blur(4px) brightness(0.3) saturate(0.5)';
+}
+
+/* ============================================================
+   DOUBLE TAP REBOOT
+============================================================ */
+function triggerReboot(x, y) {
+  hapticShatter();
+  playBootSound();
+
+  // Screen fade out with flash
+  const flash = document.getElementById('flash-overlay');
+  flash.style.transition = 'none';
+  flash.style.opacity = 1;
+  showScreen('screen-boot');
+
+  setTimeout(() => {
+    flash.style.transition = 'opacity 1s ease';
+    flash.style.opacity = 0;
+    // Reset boot bar
+    const bar = document.getElementById('boot-bar');
+    bar.style.animation = 'none';
+    void bar.offsetWidth;
+    bar.style.animation = 'boot-progress 2.5s ease-in-out forwards';
+  }, 100);
+
+  setTimeout(() => {
+    // Back to cracked screen — restore cracks
+    showScreen('screen-crack');
+  }, 3200);
+}
+
+/* ============================================================
+   MODAL
+============================================================ */
+function openModal() {
+  document.getElementById('modal-styles').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modal-styles').classList.remove('show');
+}
+function handleModalClick(e) {
+  if (e.target === document.getElementById('modal-styles')) closeModal();
+}
+function selectStyle(index, el) {
+  document.querySelectorAll('.crack-style-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentStyle = index;
+  clearCracks();
+  closeModal();
+}
+function purchaseAll() {
+  alert('Purchase flow would connect to RevenueCat SDK in production!\n\nProduct: com.crackscreen.premium_pack\nPrice: $2.99');
+}
+function purchaseNoAds() {
+  alert('Purchase flow would connect to RevenueCat SDK in production!\n\nProduct: com.crackscreen.no_ads\nPrice: $1.99');
+}
+function showSettings() {
+  alert('Settings: Vibration intensity, default crack style, prank timer duration.');
+}
+
+/* ============================================================
+   SHARE
+============================================================ */
+function showShare() {
+  document.getElementById('share-overlay').classList.add('show');
+}
+function hideShare() {
+  document.getElementById('share-overlay').classList.remove('show');
+}
+async function nativeShare() {
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'CrackScreen Prank 💥',
+        text: 'My friend literally broke my phone!! 😱 Check out the best prank app of 2026!',
+        url: window.location.href
+      });
+    } catch(e) {}
+  } else {
+    copyLink();
+  }
+}
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    alert('Link copied! Share it with your friends 🎉');
+  }).catch(() => {
+    alert('Share link: ' + window.location.href);
+  });
+}
+
+/* ============================================================
+   INTERSTITIAL
+============================================================ */
+let interSkipCount = 5;
+let interTimer = null;
+
+function showInterstitial() {
+  document.getElementById('interstitial').classList.add('show');
+  const skipBtn = document.getElementById('inter-skip');
+  interSkipCount = 5;
+  skipBtn.textContent = `Skip (${interSkipCount})`;
+  skipBtn.disabled = true;
+
+  interTimer = setInterval(() => {
+    interSkipCount--;
+    if (interSkipCount <= 0) {
+      clearInterval(interTimer);
+      skipBtn.textContent = 'Skip';
+      skipBtn.disabled = false;
+    } else {
+      skipBtn.textContent = `Skip (${interSkipCount})`;
+    }
+  }, 1000);
+}
+
+function closeInterstitial() {
+  if (interSkipCount > 0) return;
+  clearInterval(interTimer);
+  document.getElementById('interstitial').classList.remove('show');
+}
+
+/* ============================================================
+   PWA — Service Worker + Manifest
+============================================================ */
+const manifestData = {
+  name: "CrackScreen – Fake Broken Screen Prank",
+  short_name: "CrackScreen",
+  description: "The most realistic broken screen prank app of 2026",
+  start_url: "./",
+  display: "fullscreen",
+  orientation: "portrait",
+  background_color: "#000000",
+  theme_color: "#000000",
+  icons: [
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%23050508'/><text y='130' x='96' text-anchor='middle' font-size='120'>💥</text></svg>", sizes: "192x192", type: "image/svg+xml" },
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%23050508'/><text y='360' x='256' text-anchor='middle' font-size='320'>💥</text></svg>", sizes: "512x512", type: "image/svg+xml" }
+  ]
+};
+
+const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+const manifestURL = URL.createObjectURL(manifestBlob);
+document.getElementById('manifest-link').href = manifestURL;
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE_NAME = 'crackscreen-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.add('/')));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(clients.claim());
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(e.request, copy));
+          return res;
+        }).catch(() => caches.match('/')))
+      );
+    });
+  `;
+  const swBlob = new Blob([swCode], { type: 'application/javascript' });
+  const swURL = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swURL).catch(() => {});
+}
+
+// PWA install
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('install-btn').style.display = '';
+});
+
+function installPWA() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(() => {
+      deferredInstallPrompt = null;
+      document.getElementById('install-btn').style.display = 'none';
     });
   }
 }
-function tickParticles() {
-  pCx.clearRect(0,0,cW,cH);
-  for (var i=particles.length-1;i>=0;i--) {
-    var p=particles[i];
-    p.x+=p.vx; p.y+=p.vy; p.vy+=0.28; p.vx*=0.98;
-    p.rot+=p.rv; p.life-=p.decay;
-    if (p.life<=0){ particles.splice(i,1); continue; }
-    pCx.save();
-    pCx.globalAlpha=p.life*0.85;
-    pCx.fillStyle='rgba(210,225,255,'+p.life+')';
-    pCx.translate(p.x,p.y); pCx.rotate(p.rot);
-    pCx.beginPath();
-    pCx.moveTo(-p.s,0); pCx.lineTo(0,-p.s*1.6);
-    pCx.lineTo(p.s,0);  pCx.lineTo(p.s*0.3,p.s);
-    pCx.closePath(); pCx.fill();
-    pCx.restore();
+
+/* ============================================================
+   DeviceOrientation — parallax on cracks
+============================================================ */
+let targetTiltX = 0, targetTiltY = 0;
+let currentTiltX = 0, currentTiltY = 0;
+
+window.addEventListener('deviceorientation', (e) => {
+  if (currentScreen !== 'screen-crack') return;
+  targetTiltX = (e.gamma || 0) / 30; // -1 to 1
+  targetTiltY = (e.beta || 45) / 30 - 1; // normalized
+}, { passive: true });
+
+function animateParallax() {
+  currentTiltX += (targetTiltX - currentTiltX) * 0.1;
+  currentTiltY += (targetTiltY - currentTiltY) * 0.1;
+  if (crackCanvas && Math.abs(currentTiltX) > 0.001) {
+    crackCanvas.style.transform = `translate(${currentTiltX * 8}px, ${currentTiltY * 6}px) perspective(800px) rotateX(${currentTiltY * 3}deg) rotateY(${currentTiltX * 3}deg)`;
   }
+  requestAnimationFrame(animateParallax);
 }
+animateParallax();
 
-/* ── LOOP ── */
-function startLoop() {
-  if (raf) return;
-  function loop() { tickParticles(); raf=requestAnimationFrame(loop); }
-  raf = requestAnimationFrame(loop);
-}
-function stopLoop() { if(raf){cancelAnimationFrame(raf);raf=null;} }
-
-/* ── CRACK HANDLER ── */
-var ERRORS=[
-  {t:'⚠️ HARDWARE FAILURE',b:'Screen damage detected! Visit a repair shop.'},
-  {t:'💀 CRITICAL ERROR',  b:'Display integrity compromised. Contact support.'},
-  {t:'🆘 SYSTEM ALERT',    b:'Touchscreen malfunction — 3 faults found.'},
-  {t:'📱 REPAIR NEEDED',   b:'AMOLED fracture detected! Replace screen now?'},
-  {t:'⚡ VOLTAGE SPIKE',   b:'Short circuit in display module. Restart?'},
-  {t:'😱 OH NO!',          b:'Your screen is completely shattered!'},
-  {t:'🛠️ GLASS CRACKED',  b:'Multi-layer fracture — check your insurance!'},
-  {t:'🔴 DISPLAY ERROR',   b:'Screen buffer overflow. Reboot device now?'},
-];
-
-function handleCrack(x,y,intensity) {
-  crackCount++;
-  addCrack(x,y,intensity);
-  spawnParticles(x,y, Math.floor(8+intensity*2));
-  vib([50,30,50]);
-  crackSound(intensity/5);
-  if (crackCount===1) {
-    document.getElementById('tap-hint').style.opacity='0';
+/* ============================================================
+   REQUEST DEVICE MOTION PERMISSIONS (iOS 13+)
+============================================================ */
+document.getElementById('btn-start').addEventListener('touchend', async () => {
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+    try {
+      await DeviceMotionEvent.requestPermission();
+    } catch(e) {}
   }
-  if (S.errors && crackCount%3===0) showError();
-  doShake();
-}
-
-function showError() {
-  var ez=document.getElementById('error-zone');
-  var e=ERRORS[Math.floor(Math.random()*ERRORS.length)];
-  var d=document.createElement('div');
-  d.className='err-toast';
-  d.innerHTML='<div class="err-title">'+e.t+'</div><div class="err-body">'+e.b+'</div>';
-  ez.appendChild(d);
-  setTimeout(function(){
-    d.style.transition='opacity 0.5s';
-    d.style.opacity='0';
-    setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); },500);
-  },3000);
-}
-
-function doShake() {
-  var sc=document.getElementById('s-crack');
-  sc.classList.remove('do-shake');
-  void sc.offsetWidth;
-  sc.classList.add('do-shake');
-  setTimeout(function(){ sc.classList.remove('do-shake'); },460);
-}
-
-/* ── BIND CRACK SCREEN TOUCH ── */
-var crackBound=false;
-function bindCrackScreen() {
-  if (crackBound) return;
-  crackBound=true;
-  var el=document.getElementById('s-crack');
-
-  el.addEventListener('touchstart', function(e) {
-    // allow action bar buttons to work
-    if (e.target.closest && e.target.closest('#action-bar')) return;
-    e.preventDefault();
-    var t=e.changedTouches[0];
-    var x=t.clientX, y=t.clientY;
-
-    var now=Date.now();
-    if (now-lastTap<340) { triggerBoot(); return; }
-    lastTap=now;
-
-    isHolding=true;
-    document.getElementById('press-harder').classList.add('show');
-    handleCrack(x,y,S.intensity);
-
-    clearInterval(holdTimer);
-    holdTimer=setInterval(function(){
-      if (!isHolding) return;
-      handleCrack(x+(Math.random()-0.5)*50, y+(Math.random()-0.5)*50, S.intensity*1.4);
-    },380);
-  },{passive:false});
-
-  el.addEventListener('touchend', function(e) {
-    if (e.target.closest && e.target.closest('#action-bar')) return;
-    e.preventDefault();
-    isHolding=false;
-    clearInterval(holdTimer);
-    document.getElementById('press-harder').classList.remove('show');
-  },{passive:false});
-
-  el.addEventListener('touchcancel', function() {
-    isHolding=false;
-    clearInterval(holdTimer);
-    document.getElementById('press-harder').classList.remove('show');
-  });
-
-  el.addEventListener('touchmove', function(e) {
-    if (e.target.closest && e.target.closest('#action-bar')) return;
-    e.preventDefault();
-  },{passive:false});
-
-  // Desktop fallback
-  el.addEventListener('mousedown', function(e) {
-    if (e.target.closest && e.target.closest('#action-bar')) return;
-    var now=Date.now();
-    if (now-lastTap<340) { triggerBoot(); return; }
-    lastTap=now;
-    isHolding=true;
-    document.getElementById('press-harder').classList.add('show');
-    handleCrack(e.clientX,e.clientY,S.intensity);
-    clearInterval(holdTimer);
-    holdTimer=setInterval(function(){
-      if(!isHolding) return;
-      handleCrack(e.clientX+(Math.random()-0.5)*50,e.clientY+(Math.random()-0.5)*50,S.intensity*1.4);
-    },380);
-  });
-  el.addEventListener('mouseup', function() {
-    isHolding=false; clearInterval(holdTimer);
-    document.getElementById('press-harder').classList.remove('show');
-  });
-}
-
-/* ── SHAKE ── */
-var shakeBound=false;
-function bindShake() {
-  if (shakeBound||!window.DeviceMotionEvent) return;
-  shakeBound=true;
-  var last={x:0,y:0,z:0}, shakeCD=0;
-  function handler(e) {
-    if (!S.shake) return;
-    var a=e.accelerationIncludingGravity; if(!a) return;
-    var dx=Math.abs((a.x||0)-last.x), dy=Math.abs((a.y||0)-last.y), dz=Math.abs((a.z||0)-last.z);
-    if (dx+dy+dz>28 && Date.now()>shakeCD) {
-      shakeCD=Date.now()+600;
-      if (!document.getElementById('s-crack').classList.contains('hidden')) {
-        var x=cW*0.2+Math.random()*cW*0.6, y=cH*0.2+Math.random()*cH*0.6;
-        handleCrack(x,y,S.intensity*1.8);
-        spawnParticles(x,y,18);
-      }
-    }
-    last={x:a.x||0,y:a.y||0,z:a.z||0};
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    try {
+      await DeviceOrientationEvent.requestPermission();
+    } catch(e) {}
   }
-  if (typeof DeviceMotionEvent.requestPermission==='function') {
-    DeviceMotionEvent.requestPermission().then(function(r){
-      if(r==='granted') window.addEventListener('devicemotion',handler);
-    }).catch(function(){});
-  } else {
-    window.addEventListener('devicemotion',handler);
-  }
-}
-
-/* ── FLOW ── */
-function startCountdown() {
-  show('s-countdown');
-  var n=3;
-  var el=document.getElementById('cd-num');
-
-  function tick() {
-    el.classList.remove('pop');
-    void el.offsetWidth;
-    el.textContent = n>0 ? n : 'GO!';
-    el.classList.add('pop');
-    if (n<=0) { setTimeout(goToHome, 500); return; }
-    n--;
-    setTimeout(tick,1000);
-  }
-  tick();
-}
-
-function goToHome() {
-  var now=new Date();
-  var h=now.getHours(), m=('0'+now.getMinutes()).slice(-2);
-  document.getElementById('hs-time').textContent=h+':'+m;
-  document.getElementById('hs-time-small').textContent=h+':'+m;
-  var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  var mons=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('hs-date').textContent=days[now.getDay()]+', '+mons[now.getMonth()]+' '+now.getDate();
-  show('s-home');
-
-  function go(e) {
-    e.preventDefault();
-    var hs=document.getElementById('s-home');
-    hs.removeEventListener('touchstart',go);
-    hs.removeEventListener('click',go);
-    goToCrack();
-  }
-  var hs=document.getElementById('s-home');
-  hs.addEventListener('touchstart',go,{once:true,passive:false});
-  hs.addEventListener('click',go,{once:true});
-}
-
-function goToCrack() {
-  prankCount++;
-  show('s-crack');
-  setupCanvas();
-  startLoop();
-  bindCrackScreen();
-  bindShake();
-  crackCount=0;
-  cracks=[]; particles=[];
-  if(cCx) cCx.clearRect(0,0,cW,cH);
-  if(pCx) pCx.clearRect(0,0,cW,cH);
-  document.getElementById('tap-hint').style.opacity='1';
-  document.getElementById('error-zone').innerHTML='';
-  toast('Tap to crack! Prank your friends 😈');
-
-  clearTimeout(autoBootTimer);
-  autoBootTimer=setTimeout(function(){
-    if (!document.getElementById('s-crack').classList.contains('hidden')) triggerBoot();
-  },30000);
-
-  if (prankCount>0 && prankCount%4===0) {
-    setTimeout(function(){
-      if (!document.getElementById('s-crack').classList.contains('hidden')) show('s-inter');
-    },2500);
-  }
-}
-
-function resetCracks() {
-  cracks=[]; particles=[];
-  if(cCx) cCx.clearRect(0,0,cW,cH);
-  if(pCx) pCx.clearRect(0,0,cW,cH);
-  crackCount=0;
-  document.getElementById('tap-hint').style.opacity='1';
-  document.getElementById('error-zone').innerHTML='';
-  vib([80]);
-}
-
-function triggerBoot() {
-  stopLoop();
-  show('s-boot');
-  var bar=document.getElementById('boot-bar');
-  bar.style.transition='none';
-  bar.style.width='0%';
-  setTimeout(function(){
-    bar.style.transition='width 2.2s linear';
-    bar.style.width='100%';
-  },120);
-  setTimeout(function(){
-    // white flash
-    var f=document.createElement('div');
-    f.style.cssText='position:fixed;inset:0;background:#fff;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.25s';
-    document.body.appendChild(f);
-    setTimeout(function(){ f.style.opacity='0'; setTimeout(function(){ if(f.parentNode) f.parentNode.removeChild(f); },250); },80);
-    show('s-crack');
-    startLoop();
-  },3500);
-}
-
-/* ── SETTINGS ── */
-function getCurrentScreen() {
-  var ids=['s-launch','s-crack','s-home','s-countdown','s-boot'];
-  for(var i=0;i<ids.length;i++){
-    var el=document.getElementById(ids[i]);
-    if(el&&!el.classList.contains('hidden')) return ids[i];
-  }
-  return 's-launch';
-}
-
-function buildPacks() {
-  var row=document.getElementById('pack-scroll');
-  row.innerHTML='';
-  PACKS.forEach(function(pk){
-    var d=document.createElement('div');
-    d.className='pack-card'+(S.pack===pk.id?' sel':'');
-    d.innerHTML='<span class="pack-em">'+pk.em+'</span><div class="pack-nm">'+pk.nm+'</div><div class="pack-pr">'+(pk.pr||'Free')+'</div>'+(pk.pr?'<span class="pack-lock">🔒</span>':'');
-    (function(pkRef,el){
-      el.addEventListener('click',function(){
-        if(pkRef.pr){ alert('Unlock "'+pkRef.nm+'" for '+pkRef.pr+' — Coming soon! 💜'); return; }
-        S.pack=pkRef.id;
-        document.querySelectorAll('.pack-card').forEach(function(c){ c.classList.remove('sel'); });
-        el.classList.add('sel');
-        redrawAll();
-      });
-    })(pk,d);
-    row.appendChild(d);
-  });
-}
-
-function openSettings() {
-  prevScreen=getCurrentScreen();
-  buildPacks();
-  // sync toggle states
-  document.getElementById('t-sound').checked=S.sound;
-  document.getElementById('t-vibrate').checked=S.vibrate;
-  document.getElementById('t-errors').checked=S.errors;
-  document.getElementById('t-shake').checked=S.shake;
-  document.getElementById('r-intensity').value=S.intensity;
-  document.getElementById('rv').textContent=S.intensity;
-  show('s-settings');
-}
-
-function closeSettings() {
-  if(prevScreen==='s-crack'){ show('s-crack'); if(!raf) startLoop(); }
-  else { show('s-launch'); }
-}
-
-/* ── SHARE ── */
-function openShare() {
-  var sc=document.getElementById('c-share');
-  sc.width=cW; sc.height=cH;
-  var ctx=sc.getContext('2d');
-  ctx.fillStyle='#000'; ctx.fillRect(0,0,cW,cH);
-  if(cC) ctx.drawImage(cC,0,0);
-  show('s-share');
-}
-
-function doShare() {
-  var msg='😂 Just pranked my friend with CrackScreen! Their reaction was PRICELESS 💀\n#CrackScreen #PrankApp #ScreenPrank';
-  var sc=document.getElementById('c-share');
-  if (navigator.share) {
-    if (sc.toBlob) {
-      sc.toBlob(function(blob){
-        try {
-          var f=new File([blob],'crackscreen.png',{type:'image/png'});
-          navigator.share({title:'CrackScreen Prank',text:msg,files:[f]}).catch(function(){
-            navigator.share({title:'CrackScreen Prank',text:msg}).catch(function(){});
-          });
-        } catch(e) {
-          navigator.share({title:'CrackScreen Prank',text:msg}).catch(function(){});
-        }
-      });
-    } else {
-      navigator.share({title:'CrackScreen Prank',text:msg}).catch(function(){});
-    }
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(msg).then(function(){
-      toast('Copied to clipboard! Paste anywhere 😂');
-    }).catch(function(){});
-  } else {
-    alert(msg);
-  }
-}
-
-/* ── WIRE BUTTONS ── */
-document.getElementById('btn-start').addEventListener('click', startCountdown);
-document.getElementById('btn-open-settings').addEventListener('click', openSettings);
-document.getElementById('ab-reset').addEventListener('click', resetCracks);
-document.getElementById('ab-restart').addEventListener('click', triggerBoot);
-document.getElementById('ab-share').addEventListener('click', openShare);
-document.getElementById('ab-settings').addEventListener('click', openSettings);
-document.getElementById('ab-home').addEventListener('click', function(){ stopLoop(); show('s-launch'); });
-document.getElementById('btn-close-drawer').addEventListener('click', closeSettings);
-document.getElementById('btn-noad').addEventListener('click', function(){ alert('Remove Ads — Coming soon! Thanks for supporting us 💜'); });
-document.getElementById('btn-skip-inter').addEventListener('click', function(){ show('s-crack'); if(!raf) startLoop(); });
-document.getElementById('btn-close-share').addEventListener('click', function(){ show('s-crack'); if(!raf) startLoop(); });
-document.getElementById('sb-share').addEventListener('click', doShare);
-document.getElementById('sb-copy').addEventListener('click', function(){
-  var msg='😂 Just pranked my friend with CrackScreen!\n#CrackScreen #PrankApp';
-  if(navigator.clipboard){ navigator.clipboard.writeText(msg).then(function(){ toast('Copied! 📋'); }); }
-  else { alert(msg); }
 });
-
-// Settings toggles
-document.getElementById('t-sound').addEventListener('change',function(){ S.sound=this.checked; });
-document.getElementById('t-vibrate').addEventListener('change',function(){ S.vibrate=this.checked; });
-document.getElementById('t-errors').addEventListener('change',function(){ S.errors=this.checked; });
-document.getElementById('t-shake').addEventListener('change',function(){ S.shake=this.checked; });
-document.getElementById('r-intensity').addEventListener('input',function(){
-  S.intensity=parseInt(this.value,10);
-  document.getElementById('rv').textContent=this.value;
-});
-
-// Settings backdrop
-document.getElementById('s-settings').addEventListener('click',function(e){
-  if(e.target===this) closeSettings();
-});
-// Share backdrop
-document.getElementById('s-share').addEventListener('click',function(e){
-  if(e.target===this){ show('s-crack'); if(!raf) startLoop(); }
-});
-
-// Global: prevent bounce
-document.addEventListener('touchmove',function(e){ e.preventDefault(); },{passive:false});
-document.addEventListener('contextmenu',function(e){ e.preventDefault(); });
-window.addEventListener('resize',function(){ if(cC) doResize(); });
-
-// Wake lock
-if(navigator.wakeLock){
-  navigator.wakeLock.request('screen').catch(function(){});
-}
-
-// ── BOOT ──
-show('s-launch');
-
-})();
 </script>
 </body>
 </html>
